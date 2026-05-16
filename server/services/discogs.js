@@ -137,6 +137,32 @@ async function getMasterDetails(masterId) {
   return discogsGet(`/masters/${masterId}`);
 }
 
+/**
+ * リリースIDまたはマスターIDから高解像度画像のURLを取得する
+ * @param {number|string} id 
+ * @param {string} type 'master' or 'release'
+ * @returns {Promise<string|null>}
+ */
+async function getHighResImageById(id, type = 'master') {
+  try {
+    const details = type === 'release' 
+      ? await getReleaseDetails(id) 
+      : await getMasterDetails(id);
+      
+    if (details && details.images && details.images.length > 0) {
+      // images配列から primary のもの、あるいは一番最初の画像の resource_url を取得
+      const primaryImage = details.images.find(img => img.type === 'primary') || details.images[0];
+      return primaryImage.resource_url || primaryImage.uri;
+    }
+    return null;
+  } catch (error) {
+    console.warn(`[Discogs] Failed to fetch image for ${type} ${id}:`, error.message);
+    if (error.status === 429) {
+      throw new Error('rate_limit:5'); // 429の場合、5秒後にリトライさせる
+    }
+    return null;
+  }
+}
 
 module.exports = {
   searchArtists,
@@ -146,4 +172,5 @@ module.exports = {
   searchReleasesGeneral,
   getReleaseDetails,
   getMasterDetails,
+  getHighResImageById,
 };

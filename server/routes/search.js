@@ -9,7 +9,6 @@ const express = require('express');
 const router = express.Router();
 
 const discogs = require('../services/discogs');
-const spotify = require('../services/spotify');
 const { filterReleases, filterArtistReleases } = require('../services/filter');
 const { findRealArtist, smartSort, deduplicateReleases } = require('../services/scoring');
 const { containsJapanese, resolveArtistName } = require('../services/translate');
@@ -290,13 +289,13 @@ router.get('/stock', async (req, res, next) => {
 // ============================================================
 router.get('/image', async (req, res, next) => {
   try {
-    const { artist, title } = req.query;
-    if (!artist || !title) {
-      return res.status(400).json({ error: 'artist and title are required' });
+    const { id, type } = req.query;
+    if (!id) {
+      return res.status(400).json({ error: 'id is required' });
     }
     
-    // Spotify APIを使用して高画質画像を取得
-    const imageUrl = await spotify.getHighResImage(artist, title);
+    // Discogs APIを使用して高画質画像を取得
+    const imageUrl = await discogs.getHighResImageById(id, type || 'master');
     
     // 見つからなかった場合は空文字列を返す（フロントエンドでプレースホルダーを表示するため）
     res.json({ imageUrl: imageUrl || '' });
