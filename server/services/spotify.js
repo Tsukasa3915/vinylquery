@@ -74,6 +74,9 @@ async function getHighResImage(artist, title) {
     if (response.ok) {
       const text = await response.text();
       try { data = JSON.parse(text); } catch(e) {}
+    } else if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After') || 2;
+      throw new Error(`rate_limit:${retryAfter}`);
     }
 
     // 2. ヒットしなかった場合、またはエラーの場合、単純なキーワード検索でフォールバック

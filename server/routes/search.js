@@ -301,6 +301,10 @@ router.get('/image', async (req, res, next) => {
     // 見つからなかった場合は空文字列を返す（フロントエンドでプレースホルダーを表示するため）
     res.json({ imageUrl: imageUrl || '' });
   } catch (error) {
+    if (error.message && error.message.startsWith('rate_limit')) {
+      const retryAfter = parseInt(error.message.split(':')[1], 10) || 2;
+      return res.status(429).json({ error: 'Too Many Requests', retryAfter });
+    }
     next(error);
   }
 });

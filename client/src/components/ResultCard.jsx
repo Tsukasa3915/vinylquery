@@ -115,13 +115,28 @@ const ResultCard = ({ release, index, layout }) => {
     return () => observer.disconnect();
   }, [hasFetched, release]);
 
-  const fetchHighResImage = async () => {
+  const fetchHighResImage = async (retryCount = 0) => {
     try {
       const artist = Array.isArray(release.artist) ? release.artist[0] : release.artist;
       const title = release.title;
       if (!artist || !title) return;
 
+      // 初回リクエスト時はアクセスを分散させるため、0.1〜1.5秒のランダムな遅延を入れる
+      if (retryCount === 0) {
+        const jitter = Math.floor(Math.random() * 1400) + 100;
+        await new Promise(resolve => setTimeout(resolve, jitter));
+      }
+
       const res = await fetch(`/api/search/image?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+      
+      if (res.status === 429 && retryCount < 3) {
+        // Too Many Requestsの場合、指定秒数またはランダム秒数待ってからリトライ
+        const data = await res.json().catch(() => ({}));
+        const retryAfterMs = (data.retryAfter * 1000) || (2000 + Math.random() * 2000);
+        setTimeout(() => fetchHighResImage(retryCount + 1), retryAfterMs);
+        return;
+      }
+
       if (res.ok) {
         const data = await res.json();
         if (data.imageUrl && data.imageUrl !== release.cover_image) {
