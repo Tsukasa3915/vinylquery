@@ -134,8 +134,11 @@ async function getHighResImage(artist, title) {
       const finalAlbum = bestAlbum || items[0];
 
       if (finalAlbum && finalAlbum.images && finalAlbum.images.length > 0) {
-        // Spotifyの画像配列は通常 [大(640x640), 中(300x300), 小(64x64)] の順
-        return finalAlbum.images[0].url;
+        // 画像配列の中から最も解像度が高い（widthが最大）ものを取得する
+        const largestImage = finalAlbum.images.reduce((prev, current) => {
+          return (prev.width > current.width) ? prev : current;
+        });
+        return largestImage.url;
       }
     }
 
