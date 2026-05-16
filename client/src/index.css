@@ -94,12 +94,12 @@ body::after {
 }
 
 body::before {
-  background: radial-gradient(ellipse at 35% 35%, rgba(233, 69, 96, 0.06), transparent 45%);
+  background: radial-gradient(ellipse at 35% 35%, rgba(233, 69, 96, 0.02), transparent 45%);
   animation: ambientDrift 12s ease-in-out infinite alternate;
 }
 
 body::after {
-  background: radial-gradient(ellipse at 65% 65%, rgba(60, 70, 130, 0.12), transparent 45%);
+  background: radial-gradient(ellipse at 65% 65%, rgba(60, 70, 130, 0.04), transparent 45%);
   animation: ambientDrift 15s ease-in-out infinite alternate-reverse;
 }
 
