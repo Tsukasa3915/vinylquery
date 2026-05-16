@@ -26,7 +26,8 @@ app.get('/api/health', (req, res) => {
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // API以外のすべてのリクエストをフロントエンドの index.html に転送（React Router用）
-app.get('/*', (req, res) => {
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
