@@ -64,7 +64,7 @@ async function getHighResImage(artist, title) {
 
     // 1. まず「アルバム名 + アーティスト名」で厳格に検索
     let query = encodeURIComponent(`album:${cleanTitle} artist:${cleanArtist}`);
-    let url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=1`;
+    let url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=20`;
 
     let response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -75,7 +75,7 @@ async function getHighResImage(artist, title) {
     // 2. ヒットしなかった場合、またはエラーの場合、単純なキーワード検索でフォールバック
     if (!response.ok || !data.albums || data.albums.items.length === 0) {
       query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`);
-      url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=1`;
+      url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=20`;
       
       response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -84,10 +84,58 @@ async function getHighResImage(artist, title) {
     }
 
     if (response.ok && data.albums && data.albums.items.length > 0) {
-      const album = data.albums.items[0];
-      if (album.images && album.images.length > 0) {
+      const items = data.albums.items;
+      let bestAlbum = null;
+      let highestScore = -1;
+
+      // 除外するノイズキーワード
+      const noiseWords = ['カラオケ', 'karaoke', 'オルゴール', 'music box', 'カバー', 'cover', 'tribute', 'トリビュート', 'instrumental', 'インスト', 'remix', 'リミックス'];
+
+      for (const album of items) {
+        let score = 0;
+        const albumName = album.name.toLowerCase();
+        const artistNames = album.artists.map(a => a.name.toLowerCase());
+        const queryArtist = cleanArtist.toLowerCase();
+
+        // 1. ノイズチェック（強制除外）
+        const isNoise = noiseWords.some(word => 
+          albumName.includes(word) || artistNames.some(a => a.includes(word))
+        );
+        if (isNoise) continue; // ノイズが含まれる場合はスキップ
+
+        // 2. アーティスト名の一致（非常に重要）
+        const isArtistMatch = artistNames.includes(queryArtist) || 
+                              artistNames.some(a => a.includes(queryArtist) || queryArtist.includes(a));
+        
+        if (isArtistMatch) {
+          score += 100; // 本人の作品であれば超高得点
+        } else {
+          // Various Artists などの場合
+          if (artistNames.includes('various artists')) {
+            score -= 50;
+          } else {
+            score -= 10;
+          }
+        }
+
+        // 3. アルバムタイプの優先度
+        if (album.album_type === 'album') score += 20;
+        if (album.album_type === 'single') score += 10;
+        if (album.album_type === 'compilation') score -= 30; // オムニバスは優先度を下げる
+
+        // 最もスコアが高いものを記録
+        if (score > highestScore) {
+          highestScore = score;
+          bestAlbum = album;
+        }
+      }
+
+      // もし全ての候補がノイズで除外されてしまった場合は、最初の結果をフォールバック採用
+      const finalAlbum = bestAlbum || items[0];
+
+      if (finalAlbum && finalAlbum.images && finalAlbum.images.length > 0) {
         // Spotifyの画像配列は通常 [大(640x640), 中(300x300), 小(64x64)] の順
-        return album.images[0].url;
+        return finalAlbum.images[0].url;
       }
     }
 
