@@ -70,17 +70,28 @@ async function getHighResImage(artist, title) {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
-    let data = await response.json();
+    let data = {};
+    if (response.ok) {
+      const text = await response.text();
+      try { data = JSON.parse(text); } catch(e) {}
+    }
 
     // 2. ヒットしなかった場合、またはエラーの場合、単純なキーワード検索でフォールバック
     if (!response.ok || !data.albums || data.albums.items.length === 0) {
-      query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`);
-      url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=20`;
-      
-      response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      data = await response.json();
+      // Too many requestsの場合はフォールバックも失敗するのでスキップ
+      if (response.status !== 429) {
+        query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`);
+        url = `https://api.spotify.com/v1/search?q=${query}&type=album&limit=20`;
+        
+        response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const text = await response.text();
+          try { data = JSON.parse(text); } catch(e) {}
+        }
+      }
     }
 
     if (response.ok && data.albums && data.albums.items.length > 0) {
