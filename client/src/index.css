@@ -72,6 +72,12 @@ body {
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  
+  /* アンビエントライト演出（画面の角からふわっと色が差すおしゃれなグラデーション） */
+  background-image: 
+    radial-gradient(circle at top left, rgba(233, 69, 96, 0.08), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(0, 210, 255, 0.08), transparent 60%);
+  background-attachment: fixed;
 
   /* iOS safe area padding */
   padding-top: var(--safe-top);
