@@ -1,0 +1,16 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# 環境変数（重要：絶対にコミットしない！）
+.env
+server/.env
+client/.env
+.env.local
+.env.*.local
+
+# ビルド出力
+client/dist/
+
+# Mac / OS ファイル
+.DS_Store
