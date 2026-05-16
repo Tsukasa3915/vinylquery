@@ -72,11 +72,42 @@ body {
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  position: relative;
 
   /* iOS safe area padding */
   padding-top: var(--safe-top);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
+}
+
+/* 極薄のグラデーション ＋ 大きく動くアニメーション */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background: radial-gradient(ellipse at 35% 35%, rgba(233, 69, 96, 0.04), transparent 45%);
+  animation: ambientDrift 10s ease-in-out infinite alternate;
+}
+
+body::after {
+  background: radial-gradient(ellipse at 65% 65%, rgba(60, 70, 130, 0.06), transparent 45%);
+  animation: ambientDrift 13s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes ambientDrift {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(-12%, 8%) scale(1.2) rotate(5deg); }
+  66% { transform: translate(8%, -12%) scale(0.8) rotate(-5deg); }
+  100% { transform: translate(-6%, 6%) scale(1.1) rotate(2deg); }
 }
 
 #root {
