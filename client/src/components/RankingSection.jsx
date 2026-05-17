@@ -29,15 +29,14 @@ const RankingSection = ({ title = "注目のアナログレコード", layout = 
   }
 
   return (
-    <div className="ranking-section">
-      <h2 className="text-xl font-bold text-white mb-6 tracking-tight flex items-center gap-2">
+    <div className="ranking-container">
+      <h2 className="ranking-title">
         <span>🏆</span> {title}
       </h2>
-      <div className={layout === 'list' ? 'flex flex-col gap-4' : 'grid grid-cols-2 gap-4'}>
+      <div className="ranking-list">
         {ranking.map((item, index) => (
-          <div key={item.id} className="relative group">
-            {/* シックなランキング順位バッジ */}
-            <div className="absolute top-2 left-2 z-10 bg-black/80 backdrop-blur text-white text-[10px] px-1.5 py-0.5 rounded font-bold border border-white/10 shadow-md">
+          <div key={item.id} className="ranking-item-wrapper">
+            <div className="ranking-badge">
               #{index + 1}
             </div>
             <ResultCard release={item} layout={layout} index={index} />
