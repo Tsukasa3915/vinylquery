@@ -598,25 +598,25 @@ select:focus {
 /* =============================================
    Results List (1-column)
    ============================================= */
-.results-list {
+.results-list, .ranking-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.results-list .result-card {
+.results-list .result-card, .ranking-list .result-card {
   display: flex;
   flex-direction: row;
   align-items: stretch;
 }
 
-.results-list .result-card .card-link {
+.results-list .result-card .card-link, .ranking-list .result-card .card-link {
   display: flex;
   flex-direction: row;
   width: 100%;
 }
 
-.results-list .result-card .card-image-wrapper {
+.results-list .result-card .card-image-wrapper, .ranking-list .result-card .card-image-wrapper {
   width: 100px;
   min-width: 100px;
   padding-top: 0;
@@ -624,7 +624,7 @@ select:focus {
   flex-shrink: 0;
 }
 
-.results-list .result-card .card-content {
+.results-list .result-card .card-content, .ranking-list .result-card .card-content {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -632,15 +632,15 @@ select:focus {
   min-width: 0;
 }
 
-.results-list .result-card .card-title {
+.results-list .result-card .card-title, .ranking-list .result-card .card-title {
   font-size: 1rem;
 }
 
-.results-list .result-card .card-artist {
+.results-list .result-card .card-artist, .ranking-list .result-card .card-artist {
   margin-bottom: 4px;
 }
 
-.results-list .result-card .format-badge {
+.results-list .result-card .format-badge, .ranking-list .result-card .format-badge {
   bottom: 4px;
   right: 4px;
   font-size: 0.6rem;
@@ -1338,7 +1338,7 @@ select:focus {
   margin-top: 10px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 769px) {
   .home-layout-container {
     flex-direction: row;
     align-items: flex-start;
@@ -1422,7 +1422,7 @@ select:focus {
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 769px) {
   .bottom-nav {
     display: none;
   }
@@ -1453,7 +1453,7 @@ select:focus {
   height: 22px;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 768px) {
   .hidden-mobile-tab {
     display: none !important;
   }
