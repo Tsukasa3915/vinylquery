@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const searchRoutes = require('./routes/search');
+const rankingRoutes = require('./routes/ranking');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // ルート (API)
 app.use('/api/search', searchRoutes);
+app.use('/api/ranking', rankingRoutes);
 
 // ヘルスチェック
 app.get('/api/health', (req, res) => {
