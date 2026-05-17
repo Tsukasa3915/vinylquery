@@ -21,7 +21,8 @@ const Home = () => {
     error,
     sortOption,
     setSortOption,
-    handleSearch
+    handleSearch,
+    resetSearch
   } = useSearch();
 
   // sessionStorageから初期値を取得
@@ -54,6 +55,13 @@ const Home = () => {
     }
   };
 
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    setActiveTab('home');
+    setHasSearched(false);
+    resetSearch();
+  };
+
   return (
     <div className="page-container" style={{ paddingBottom: '90px' }}>
       {/* 
@@ -65,6 +73,19 @@ const Home = () => {
            1. ランキングエリア (左側)
            ============================================= */}
         <div className={`home-sidebar ${activeTab === 'home' ? 'active-mobile-tab' : 'hidden-mobile-tab'}`}>
+          {/* ホーム画面用のヘッダータイトルロゴ */}
+          <header className="header logo-header">
+            <div className="header-content">
+              <div className="logo-container">
+                <a href="/" onClick={handleLogoClick} className="logo-link">
+                  <h1 className="logo-text">
+                    <span className="logo-icon">📀</span> VinylQuery
+                  </h1>
+                </a>
+              </div>
+            </div>
+          </header>
+          
           <RankingSection title="注目のアナログレコード" layout="list" />
         </div>
 
@@ -76,10 +97,13 @@ const Home = () => {
           {/* ヘッダー＆検索入力 */}
           <header className="header">
             <div className="header-content">
-              <div className="logo-container">
-                <h1 className="logo-text">
-                  <span className="logo-icon">📀</span> VinylQuery
-                </h1>
+              {/* PC版では非表示にするロゴコンテナ */}
+              <div className="logo-container desktop-hide-logo">
+                <a href="/" onClick={handleLogoClick} className="logo-link">
+                  <h1 className="logo-text">
+                    <span className="logo-icon">📀</span> VinylQuery
+                  </h1>
+                </a>
               </div>
               
               <div className="search-section">

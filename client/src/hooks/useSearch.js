@@ -111,6 +111,13 @@ export const useSearch = () => {
     }
   }, [results, sortOption]);
 
+  const resetSearch = () => {
+    setQuery('');
+    setResults([]);
+    setArtistInfo(null);
+    setError(null);
+  };
+
   return {
     query,
     setQuery,
@@ -123,6 +130,7 @@ export const useSearch = () => {
     error,
     sortOption,
     setSortOption,
-    handleSearch
+    handleSearch,
+    resetSearch
   };
 };

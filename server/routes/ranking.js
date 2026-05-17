@@ -3,32 +3,64 @@ const router = express.Router();
 const discogs = require('../services/discogs');
 const { deduplicateReleases } = require('../services/scoring');
 
-// HMV風ランキングのためのシードアーティスト/キーワード
-const RANKING_SEEDS = [
-  'Bialystocks',
-  '細野晴臣',
-  'サカナクション',
-  'iri',
-  'チャットモンチー',
-  'KIRINJI',
-];
+// 各期間（デイリー、ウィークリー、マンスリー）に応じた魅力的なシードアーティスト/キーワード
+const RANKING_SEEDS = {
+  day: [
+    'Bialystocks',
+    'iri',
+    'サカナクション',
+    'KIRINJI',
+    'Tempalay',
+    '羊文学'
+  ],
+  week: [
+    '細野晴臣',
+    '大滝詠一',
+    '山下達郎',
+    '竹内まりや',
+    '坂本龍一',
+    '矢野顕子'
+  ],
+  month: [
+    'チャットモンチー',
+    'キリンジ',
+    'スピッツ',
+    '宇多田ヒカル',
+    '椎名林檎',
+    'フィッシュマンズ'
+  ]
+};
 
-// 簡易的なキャッシュ（毎リクエストDiscogsを叩かないため）
-let cachedRanking = null;
-let cacheTime = 0;
+// 簡易的なキャッシュ（期間ごとに独立して管理）
+const caches = {
+  day: null,
+  week: null,
+  month: null
+};
+
+const cacheTimes = {
+  day: 0,
+  week: 0,
+  month: 0
+};
+
 const CACHE_DURATION = 1000 * 60 * 60; // 1時間
 
 router.get('/', async (req, res, next) => {
   try {
-    if (cachedRanking && Date.now() - cacheTime < CACHE_DURATION) {
-      return res.json({ results: cachedRanking });
+    // クエリパラメータから期間を取得（デフォルトは'day'）
+    const period = req.query.period === 'week' || req.query.period === 'month' ? req.query.period : 'day';
+
+    if (caches[period] && Date.now() - cacheTimes[period] < CACHE_DURATION) {
+      return res.json({ results: caches[period] });
     }
 
-    // 各シードから2件ずつ取得して混ぜる
+    const seeds = RANKING_SEEDS[period];
     let allReleases = [];
-    for (const seed of RANKING_SEEDS) {
-      // 意図的に待機を入れてAPI制限を回避
-      await new Promise(resolve => setTimeout(resolve, 500));
+
+    for (const seed of seeds) {
+      // API制限を考慮してわずかに遅延を挿入
+      await new Promise(resolve => setTimeout(resolve, 300));
       const results = await discogs.searchReleasesGeneral(seed);
       if (results && results.length > 0) {
         // 画像があるものを優先
@@ -40,13 +72,13 @@ router.get('/', async (req, res, next) => {
     // 重複を排除
     let uniqueReleases = deduplicateReleases(allReleases);
 
-    // ランダムにシャッフルしてトップ10件を取得
+    // シャッフルしてトップ10件を取得
     uniqueReleases = uniqueReleases.sort(() => 0.5 - Math.random()).slice(0, 10);
 
-    cachedRanking = uniqueReleases;
-    cacheTime = Date.now();
+    caches[period] = uniqueReleases;
+    cacheTimes[period] = Date.now();
 
-    res.json({ results: cachedRanking });
+    res.json({ results: caches[period] });
   } catch (error) {
     next(error);
   }

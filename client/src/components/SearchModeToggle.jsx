@@ -7,7 +7,7 @@ const SearchModeToggle = ({ mode, setMode }) => {
         className={`mode-btn ${mode === 'artist' ? 'active' : ''}`}
         onClick={() => setMode('artist')}
       >
-        <span className="icon">🎤</span> アーティストから探す
+        <span className="icon">🎤</span> アーティストから探す(推奨)
       </button>
       <button
         className={`mode-btn ${mode === 'freeword' ? 'active' : ''}`}
