@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ResultCard from './ResultCard';
 
-const RankingSection = ({ title = "注目のアナログレコード", layout = "list" }) => {
+const RankingSection = ({ title = "ランキング", layout = "list", onSwapLayout, isReversed }) => {
   const [ranking, setRanking] = useState([]);
   const [period, setPeriod] = useState('day'); // 'day' | 'week' | 'month'
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +26,16 @@ const RankingSection = ({ title = "注目のアナログレコード", layout = 
     <div className="ranking-container">
       <h2 className="ranking-title">
         <span>🏆</span> {title}
+        {onSwapLayout && (
+          <button 
+            className="swap-layout-btn"
+            onClick={onSwapLayout}
+            title="左右レイアウトを入れ替える"
+            aria-label="Swap Layout"
+          >
+            ↔️
+          </button>
+        )}
       </h2>
 
       {/* Spotify風のシックな期間切り替えタブ */}
@@ -61,7 +71,7 @@ const RankingSection = ({ title = "注目のアナログレコード", layout = 
               <div className="ranking-badge">
                 #{index + 1}
               </div>
-              <ResultCard release={item} layout={layout} index={index} />
+              <ResultCard release={item} layout={layout} index={index} hideLabel={true} />
             </div>
           ))}
         </div>

@@ -197,11 +197,45 @@ function smartSort(releases, query, artistName = '') {
  * @returns {Array} 重複除去後のリリース
  */
 function deduplicateReleases(releases) {
-  const seen = new Map();
+  const seenIds = new Set();
+  const seenAlbums = new Set();
+  
   return releases.filter((release) => {
     const id = release.id;
-    if (seen.has(id)) return false;
-    seen.set(id, true);
+    if (seenIds.has(id)) return false;
+    seenIds.add(id);
+    
+    // タイトルとアーティスト名のノーマライズ
+    const artist = (release.artist || '').toLowerCase().replace(/[^a-z0-9ぁ-んァ-ヶー一-龠]/g, '').trim();
+    
+    // アルバムタイトルの正規化: 括弧やエディション表記（"リマスター", "LP", "限定盤", "(Remaster)", "[Japan]"など）を消す
+    let title = (release.title || '').toLowerCase()
+      .replace(/\(.*?\)/g, '')
+      .replace(/\[.*?\]/g, '')
+      .replace(/remastered?/g, '')
+      .replace(/limited edition/g, '')
+      .replace(/deluxe/g, '')
+      .replace(/edition/g, '')
+      .replace(/anniversary/g, '')
+      .replace(/reissue/g, '')
+      .replace(/analog/g, '')
+      .replace(/vinyl/g, '')
+      .replace(/[^a-z0-9ぁ-んァ-ヶー一-龠]/g, '')
+      .trim();
+      
+    // 括弧を消して空文字になった場合は元のタイトルを使う
+    if (!title) {
+      title = (release.title || '').toLowerCase().replace(/[^a-z0-9ぁ-んァ-ヶー一-龠]/g, '').trim();
+    }
+    
+    const albumKey = `${artist}_${title}`;
+    
+    // すでに同じアルバムが登録されている場合はスキップ
+    if (albumKey && seenAlbums.has(albumKey)) {
+      return false;
+    }
+    
+    seenAlbums.add(albumKey);
     return true;
   });
 }

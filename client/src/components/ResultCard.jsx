@@ -85,27 +85,26 @@ const PlaceholderImage = ({ title, artist }) => {
   );
 };
 
-const ResultCard = ({ release, index, layout }) => {
+const ResultCard = ({ release, index, layout, hideLabel = false }) => {
   const [highResImage, setHighResImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
 
   useEffect(() => {
-    if (hasFetched || release.cover_image?.includes('1000x1000') || release.cover_image?.includes('600x600')) {
-      setHasFetched(true);
-      return;
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasFetched) {
-          setHasFetched(true);
-          fetchHighResImage();
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          if (!hasFetched) {
+            setHasFetched(true);
+            fetchHighResImage();
+          }
           observer.disconnect();
         }
       },
-      { rootMargin: '100px' }
+      { rootMargin: '50px' }
     );
 
     if (cardRef.current) {
@@ -156,7 +155,7 @@ const ResultCard = ({ release, index, layout }) => {
   };
 
   const displayImage = highResImage || release.cover_image;
-  const cardClass = layout === 'list' ? 'result-card list-view' : 'result-card';
+  const cardClass = `result-card ${layout === 'list' ? 'list-view' : ''} ${isVisible ? 'is-visible' : ''}`;
 
   return (
     <div className={cardClass} ref={cardRef}>
@@ -189,7 +188,7 @@ const ResultCard = ({ release, index, layout }) => {
                 {release.year}
               </span>
             )}
-            {release.label && (
+            {!hideLabel && release.label && (
               <span className="meta-item label" title={Array.isArray(release.label) ? release.label.join(', ') : release.label}>
                 <span className="icon">🏷️</span> {Array.isArray(release.label) ? release.label[0] : release.label.split(',')[0]}
               </span>
@@ -197,6 +196,22 @@ const ResultCard = ({ release, index, layout }) => {
           </div>
         </div>
       </Link>
+
+      {/* 狭いカラム表示時に、マウスオーバーでふわっと浮かび上がる情報ポップアップ */}
+      {layout === 'list' && (
+        <div className="hover-preview-card">
+          {displayImage ? (
+            <img src={displayImage} alt="" className="hover-preview-image" />
+          ) : (
+            <div className="hover-preview-image-placeholder">No Image</div>
+          )}
+          <div className="hover-preview-title">{release.title}</div>
+          <div className="hover-preview-meta">
+            <span className="hover-preview-artist">{release.artist}</span>
+            {release.year && <span className="hover-preview-year"> ({release.year})</span>}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

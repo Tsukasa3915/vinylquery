@@ -8,6 +8,26 @@
 
 const discogs = require('./discogs');
 
+// 日本の主要アナログ流通アーティストの直接IDマッピング（表記ゆれとAPI誤爆防止）
+const ARTIST_ID_MAP = {
+  'iri': { id: 5891531, name: 'iri' },
+  'イリ': { id: 5891531, name: 'iri' },
+  'bialystocks': { id: 11246145, name: 'Bialystocks' },
+  'ビアリストックス': { id: 11246145, name: 'Bialystocks' },
+  'チャットモンチー': { id: 1993472, name: 'Chatmonchy' },
+  'chatmonchy': { id: 1993472, name: 'Chatmonchy' },
+  'サカナクション': { id: 1361113, name: 'Sakanaction' },
+  'sakanaction': { id: 1361113, name: 'Sakanaction' },
+  'kirinji': { id: 282436, name: 'Kirinji' },
+  'キリンジ': { id: 282436, name: 'Kirinji' },
+  'tempalay': { id: 4543781, name: 'Tempalay' },
+  'テンパレイ': { id: 4543781, name: 'Tempalay' },
+  '羊文学': { id: 6672322, name: 'Hitsujibungaku' },
+  'hitsujibungaku': { id: 6672322, name: 'Hitsujibungaku' },
+  '細野晴臣': { id: 120531, name: 'Haruomi Hosono' },
+  'haruomihosono': { id: 120531, name: 'Haruomi Hosono' }
+};
+
 /**
  * 文字列が日本語（ひらがな・カタカナ・漢字）を含むか判定
  * @param {string} text
@@ -32,6 +52,13 @@ function containsJapanese(text) {
  * @returns {Promise<string|null>} 英語名。解決できない場合は null。
  */
 async function resolveArtistName(japaneseName) {
+  const normalized = japaneseName.toLowerCase().trim();
+  if (ARTIST_ID_MAP[normalized]) {
+    const artist = ARTIST_ID_MAP[normalized];
+    console.log(`[Translate] 🎯 直接マッピング解決: "${japaneseName}" → "${artist.name}" (ID: ${artist.id})`);
+    return artist.name;
+  }
+
   if (!containsJapanese(japaneseName)) {
     return null; // 日本語でなければ翻訳不要
   }

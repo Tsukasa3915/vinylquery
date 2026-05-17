@@ -13,6 +13,25 @@ const { filterReleases, filterArtistReleases } = require('../services/filter');
 const { findRealArtist, smartSort, deduplicateReleases } = require('../services/scoring');
 const { containsJapanese, resolveArtistName } = require('../services/translate');
 
+const ARTIST_ID_MAP = {
+  'iri': { id: 5891531, name: 'iri' },
+  'イリ': { id: 5891531, name: 'iri' },
+  'bialystocks': { id: 11246145, name: 'Bialystocks' },
+  'ビアリストックス': { id: 11246145, name: 'Bialystocks' },
+  'チャットモンチー': { id: 1993472, name: 'Chatmonchy' },
+  'chatmonchy': { id: 1993472, name: 'Chatmonchy' },
+  'サカナクション': { id: 1361113, name: 'Sakanaction' },
+  'sakanaction': { id: 1361113, name: 'Sakanaction' },
+  'kirinji': { id: 282436, name: 'Kirinji' },
+  'キリンジ': { id: 282436, name: 'Kirinji' },
+  'tempalay': { id: 4543781, name: 'Tempalay' },
+  'テンパレイ': { id: 4543781, name: 'Tempalay' },
+  '羊文学': { id: 6672322, name: 'Hitsujibungaku' },
+  'hitsujibungaku': { id: 6672322, name: 'Hitsujibungaku' },
+  '細野晴臣': { id: 120531, name: 'Haruomi Hosono' },
+  'haruomihosono': { id: 120531, name: 'Haruomi Hosono' }
+};
+
 
 
 /**
@@ -88,23 +107,62 @@ router.post('/artist', async (req, res, next) => {
     }
 
     const searchQuery = query.trim();
+    const normalized = searchQuery.toLowerCase();
 
-    // Step 1: 日本語の場合は英語名も解決する
-    let englishName = null;
-    if (containsJapanese(searchQuery)) {
-      englishName = await resolveArtistName(searchQuery);
+    let realArtist = null;
+    if (ARTIST_ID_MAP[normalized]) {
+      const mapped = ARTIST_ID_MAP[normalized];
+      realArtist = {
+        id: mapped.id,
+        title: mapped.name,
+        name: mapped.name,
+        thumb: '',
+      };
+      
+      // サムネイル画像の取得を試みる
+      try {
+        const details = await discogs.getArtistDetails(realArtist.id);
+        if (details && details.images && details.images.length > 0) {
+          realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
+        }
+      } catch (err) {
+        console.warn('Failed to fetch mapped artist thumb:', err.message);
+      }
+    } else {
+      // Step 1: 日本語の場合は英語名も解決する
+      let englishName = null;
+      if (containsJapanese(searchQuery)) {
+        englishName = await resolveArtistName(searchQuery);
+      }
+
+      const effectiveQuery = englishName || searchQuery;
+      const normEffective = effectiveQuery.toLowerCase().trim();
+      
+      if (ARTIST_ID_MAP[normEffective]) {
+        const mapped = ARTIST_ID_MAP[normEffective];
+        realArtist = {
+          id: mapped.id,
+          title: mapped.name,
+          name: mapped.name,
+          thumb: '',
+        };
+        try {
+          const details = await discogs.getArtistDetails(realArtist.id);
+          if (details && details.images && details.images.length > 0) {
+            realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
+          }
+        } catch (err) {
+          console.warn('Failed to fetch mapped artist thumb:', err.message);
+        }
+      } else {
+        // Step 2: アーティストを検索
+        const artists = await discogs.searchArtists(effectiveQuery);
+        if (artists && artists.length > 0) {
+          // Step 3: 偽物排除アルゴリズムで「本物」を特定
+          realArtist = findRealArtist(artists, effectiveQuery);
+        }
+      }
     }
-
-    // Step 2: アーティストを検索
-    const effectiveQuery = englishName || searchQuery;
-    const artists = await discogs.searchArtists(effectiveQuery);
-
-    if (!artists || artists.length === 0) {
-      return res.json({ artist: null, results: [], total: 0 });
-    }
-
-    // Step 3: 偽物排除アルゴリズムで「本物」を特定
-    const realArtist = findRealArtist(artists, effectiveQuery);
 
     if (!realArtist) {
       return res.json({ artist: null, results: [], total: 0 });
@@ -119,12 +177,14 @@ router.post('/artist', async (req, res, next) => {
 
     // Step 6: データを正規化
     releases = releases.map((r) => {
-      // artist releases の場合、artist 名はアーティスト名
       return normalizeRelease({
         ...r,
         artist: r.artist || realArtist.title || realArtist.name,
       });
     });
+
+    // 重複排除を適用して別形態の重複を間引く
+    releases = deduplicateReleases(releases);
 
     // Step 7: スマートソート
     releases = smartSort(releases, searchQuery, realArtist.title || realArtist.name);

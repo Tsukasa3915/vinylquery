@@ -39,6 +39,7 @@ const Home = () => {
   const [hasSearched, setHasSearched] = useState(() => getInitialState('vq_hasSearched', false));
   const [layout, setLayout] = useState(() => getInitialState('vq_layout', 'grid')); // 'grid' or 'list'
   const [activeTab, setActiveTab] = useState('home'); // 'home' or 'search' (SP専用)
+  const [isReversed, setIsReversed] = useState(() => getInitialState('vq_isReversed', false));
 
   useEffect(() => {
     sessionStorage.setItem('vq_hasSearched', JSON.stringify(hasSearched));
@@ -47,6 +48,10 @@ const Home = () => {
   useEffect(() => {
     sessionStorage.setItem('vq_layout', JSON.stringify(layout));
   }, [layout]);
+
+  useEffect(() => {
+    sessionStorage.setItem('vq_isReversed', JSON.stringify(isReversed));
+  }, [isReversed]);
 
   const onSearch = () => {
     if (query.trim()) {
@@ -62,17 +67,24 @@ const Home = () => {
     resetSearch();
   };
 
+  const handleSwapLayout = () => {
+    setIsReversed((prev) => !prev);
+  };
+
+  // 左右反転している場合、検索メインがサイドバー幅（狭い）になるためレイアウトをlistに強制する
+  const displayLayout = isReversed ? 'list' : layout;
+
   return (
     <div className="page-container" style={{ paddingBottom: '90px' }}>
       {/* 
         大画面(PC)では2カラム並列表示、モバイル(SP)ではタブに応じて切り替えるハイブリッドレイアウト
       */}
-      <div className="home-layout-container">
+      <div className={`home-layout-container ${isReversed ? 'is-reversed' : ''}`}>
         
         {/* =============================================
-           1. ランキングエリア (左側)
+           1. ランキングエリア (左側 / 反転時は右側)
            ============================================= */}
-        <div className={`home-sidebar ${activeTab === 'home' ? 'active-mobile-tab' : 'hidden-mobile-tab'}`}>
+        <div className={`home-sidebar ${!isReversed ? 'active-sidebar-narrow' : 'active-sidebar-wide'} ${activeTab === 'home' ? 'active-mobile-tab' : 'hidden-mobile-tab'}`}>
           {/* ホーム画面用のヘッダータイトルロゴ */}
           <header className="header logo-header">
             <div className="header-content">
@@ -86,13 +98,18 @@ const Home = () => {
             </div>
           </header>
           
-          <RankingSection title="注目のアナログレコード" layout="list" />
+          <RankingSection 
+            title="ランキング" 
+            layout="list" 
+            onSwapLayout={handleSwapLayout} 
+            isReversed={isReversed}
+          />
         </div>
 
         {/* =============================================
-           2. 検索＆結果エリア (右側)
+           2. 検索＆結果エリア (右側 / 反転時は左側)
            ============================================= */}
-        <div className={`home-main ${activeTab === 'search' ? 'active-mobile-tab' : 'hidden-mobile-tab'}`}>
+        <div className={`home-main ${isReversed ? 'active-main-narrow' : 'active-main-wide'} ${activeTab === 'search' ? 'active-mobile-tab' : 'hidden-mobile-tab'}`}>
           
           {/* ヘッダー＆検索入力 */}
           <header className="header">
@@ -140,7 +157,7 @@ const Home = () => {
                   </h2>
                 </div>
                 
-                {results.length > 0 && (
+                {results.length > 0 && !isReversed && (
                   <div className="results-controls">
                     <LayoutToggle layout={layout} onLayoutChange={setLayout} />
                     <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
@@ -153,7 +170,7 @@ const Home = () => {
               results={results} 
               isLoading={isLoading} 
               hasSearched={hasSearched}
-              layout={layout}
+              layout={displayLayout}
             />
           </main>
 

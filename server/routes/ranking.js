@@ -65,15 +65,15 @@ router.get('/', async (req, res, next) => {
       if (results && results.length > 0) {
         // 画像があるものを優先
         const withImages = results.filter(r => r.cover_image && !r.cover_image.includes('spacer.gif'));
-        allReleases = allReleases.concat(withImages.slice(0, 3));
+        allReleases = allReleases.concat(withImages.slice(0, 4));
       }
     }
 
     // 重複を排除
     let uniqueReleases = deduplicateReleases(allReleases);
 
-    // シャッフルしてトップ10件を取得
-    uniqueReleases = uniqueReleases.sort(() => 0.5 - Math.random()).slice(0, 10);
+    // シャッフルしてトップ15件を取得
+    uniqueReleases = uniqueReleases.sort(() => 0.5 - Math.random()).slice(0, 15);
 
     caches[period] = uniqueReleases;
     cacheTimes[period] = Date.now();
