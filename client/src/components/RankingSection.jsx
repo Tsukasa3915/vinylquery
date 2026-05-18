@@ -33,7 +33,9 @@ const RankingSection = ({ title = "ランキング", layout = "list", onSwapLayo
             title="左右レイアウトを入れ替える"
             aria-label="Swap Layout"
           >
-            ↔️
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width: '16px', height: '16px'}}>
+              <path d="M8 7h12m0 0l-4-4m4 4l-4 4m-8 6H4m0 0l4 4m-4-4l4-4"/>
+            </svg>
           </button>
         )}
       </h2>
@@ -71,7 +73,7 @@ const RankingSection = ({ title = "ランキング", layout = "list", onSwapLayo
               <div className="ranking-badge">
                 #{index + 1}
               </div>
-              <ResultCard release={item} layout={layout} index={index} hideLabel={true} />
+              <ResultCard release={item} layout={layout} index={index} hideLabel={true} hideFormat={true} />
             </div>
           ))}
         </div>

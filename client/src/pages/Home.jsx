@@ -100,7 +100,7 @@ const Home = () => {
           
           <RankingSection 
             title="ランキング" 
-            layout="list" 
+            layout={isReversed ? "grid" : "list"} 
             onSwapLayout={handleSwapLayout} 
             isReversed={isReversed}
           />

@@ -18,8 +18,8 @@ const ARTIST_ID_MAP = {
   'イリ': { id: 5891531, name: 'iri' },
   'bialystocks': { id: 11246145, name: 'Bialystocks' },
   'ビアリストックス': { id: 11246145, name: 'Bialystocks' },
-  'チャットモンチー': { id: 1993472, name: 'Chatmonchy' },
-  'chatmonchy': { id: 1993472, name: 'Chatmonchy' },
+  'チャットモンチー': { id: 2605808, name: 'Chatmonchy' },
+  'chatmonchy': { id: 2605808, name: 'Chatmonchy' },
   'サカナクション': { id: 1361113, name: 'Sakanaction' },
   'sakanaction': { id: 1361113, name: 'Sakanaction' },
   'kirinji': { id: 282436, name: 'Kirinji' },
@@ -217,7 +217,11 @@ router.post('/freeword', async (req, res, next) => {
 
     // 日本語の場合、英語名も解決
     let englishName = null;
-    if (containsJapanese(searchQuery)) {
+    const lowerSearchQuery = searchQuery.toLowerCase();
+    
+    if (ARTIST_ID_MAP[lowerSearchQuery]) {
+      englishName = ARTIST_ID_MAP[lowerSearchQuery].name;
+    } else if (containsJapanese(searchQuery)) {
       englishName = await resolveArtistName(searchQuery);
     }
 

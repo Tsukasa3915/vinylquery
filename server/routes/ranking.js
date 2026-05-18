@@ -72,6 +72,18 @@ router.get('/', async (req, res, next) => {
     // 重複を排除
     let uniqueReleases = deduplicateReleases(allReleases);
 
+    // タイトルからアーティストを分離
+    uniqueReleases = uniqueReleases.map(r => {
+      let title = r.title || '';
+      let artist = r.artist || '';
+      if (title.includes(' - ') && !artist) {
+        const parts = title.split(' - ');
+        artist = parts[0].trim();
+        title = parts.slice(1).join(' - ').trim();
+      }
+      return { ...r, title, artist };
+    });
+
     // シャッフルしてトップ15件を取得
     uniqueReleases = uniqueReleases.sort(() => 0.5 - Math.random()).slice(0, 15);
 

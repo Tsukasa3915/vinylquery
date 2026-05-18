@@ -85,7 +85,7 @@ const PlaceholderImage = ({ title, artist }) => {
   );
 };
 
-const ResultCard = ({ release, index, layout, hideLabel = false }) => {
+const ResultCard = ({ release, index, layout, hideLabel = false, hideFormat = false }) => {
   const [highResImage, setHighResImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
@@ -95,16 +95,14 @@ const ResultCard = ({ release, index, layout, hideLabel = false }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-          if (!hasFetched) {
-            setHasFetched(true);
-            fetchHighResImage();
-          }
-          observer.disconnect();
+        const isIntersecting = entries[0].isIntersecting;
+        setIsVisible(isIntersecting);
+        if (isIntersecting && !hasFetched) {
+          setHasFetched(true);
+          fetchHighResImage();
         }
       },
-      { rootMargin: '50px' }
+      { rootMargin: '50px', threshold: 0.1 }
     );
 
     if (cardRef.current) {
@@ -176,7 +174,7 @@ const ResultCard = ({ release, index, layout, hideLabel = false }) => {
             <PlaceholderImage title={release.title} artist={release.artist} />
           )}
 
-          <div className="format-badge">{release.format || 'Vinyl'}</div>
+          {!hideFormat && <div className="format-badge">{release.format || 'Vinyl'}</div>}
         </div>
         <div className="card-content">
           <h3 className="card-title" title={release.title}>{release.title}</h3>
