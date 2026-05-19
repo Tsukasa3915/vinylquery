@@ -148,29 +148,68 @@ router.post('/artist', async (req, res, next) => {
         thumb: '',
       };
     } else {
-      // Step 1: 日本語の場合は英語名も解決する
-      let englishName = null;
-      if (containsJapanese(searchQuery)) {
-        englishName = await resolveArtistName(searchQuery);
+      // 主要アーティストのレジストリから部分一致を優先的に探す (「椎名」で「椎名林檎」などを解決する)
+      const { artistsList } = require('../services/artistRegistry');
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const artist of artistsList) {
+        let score = 0;
+        const jp = artist.japaneseName.toLowerCase();
+        const en = artist.englishName.toLowerCase();
+        
+        if (jp === normalized || en === normalized) {
+          score = 100;
+        } else if (jp.startsWith(normalized) || en.startsWith(normalized)) {
+          score = 80;
+        } else if (jp.includes(normalized) || en.includes(normalized)) {
+          score = 50;
+        } else if (artist.searchTerms && artist.searchTerms.some(t => t.toLowerCase() === normalized)) {
+          score = 60;
+        } else if (artist.searchTerms && artist.searchTerms.some(t => t.toLowerCase().includes(normalized))) {
+          score = 30;
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = artist;
+        }
       }
 
-      const effectiveQuery = englishName || searchQuery;
-      const normEffective = effectiveQuery.toLowerCase().trim();
-      
-      if (ARTIST_ID_MAP[normEffective]) {
-        const mapped = ARTIST_ID_MAP[normEffective];
+      if (bestMatch && bestScore >= 50) {
+        console.log(`[Search] 🎯 主要アーティスト部分一致解決: "${searchQuery}" → "${bestMatch.japaneseName}" (ID: ${bestMatch.id}, Score: ${bestScore})`);
         realArtist = {
-          id: mapped.id,
-          title: mapped.name,
-          name: mapped.name,
+          id: bestMatch.id,
+          title: bestMatch.englishName,
+          name: bestMatch.englishName,
+          japaneseName: bestMatch.japaneseName,
           thumb: '',
         };
       } else {
-        // Step 2: アーティストを検索
-        const artists = await discogs.searchArtists(effectiveQuery);
-        if (artists && artists.length > 0) {
-          // Step 3: 偽物排除アルゴリズムで「本物」を特定
-          realArtist = findRealArtist(artists, effectiveQuery);
+        // Step 1: 日本語の場合は英語名も解決する
+        let englishName = null;
+        if (containsJapanese(searchQuery)) {
+          englishName = await resolveArtistName(searchQuery);
+        }
+
+        const effectiveQuery = englishName || searchQuery;
+        const normEffective = effectiveQuery.toLowerCase().trim();
+        
+        if (ARTIST_ID_MAP[normEffective]) {
+          const mapped = ARTIST_ID_MAP[normEffective];
+          realArtist = {
+            id: mapped.id,
+            title: mapped.name,
+            name: mapped.name,
+            thumb: '',
+          };
+        } else {
+          // Step 2: アーティストを検索
+          const artists = await discogs.searchArtists(effectiveQuery);
+          if (artists && artists.length > 0) {
+            // Step 3: 偽物排除アルゴリズムで「本物」を特定
+            realArtist = findRealArtist(artists, effectiveQuery);
+          }
         }
       }
     }
