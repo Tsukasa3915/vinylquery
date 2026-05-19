@@ -13,54 +13,7 @@ const { filterReleases, filterArtistReleases } = require('../services/filter');
 const { findRealArtist, smartSort, deduplicateReleases } = require('../services/scoring');
 const { containsJapanese, resolveArtistName } = require('../services/translate');
 
-const ARTIST_ID_MAP = {
-  'iri': { id: 5891531, name: 'iri' },
-  'イリ': { id: 5891531, name: 'iri' },
-  'bialystocks': { id: 11246145, name: 'Bialystocks' },
-  'ビアリストックス': { id: 11246145, name: 'Bialystocks' },
-  'チャットモンチー': { id: 2605808, name: 'Chatmonchy' },
-  'chatmonchy': { id: 2605808, name: 'Chatmonchy' },
-  'サカナクション': { id: 1361113, name: 'Sakanaction' },
-  'sakanaction': { id: 1361113, name: 'Sakanaction' },
-  'kirinji': { id: 396292, name: 'Kirinji' },
-  'キリンジ': { id: 396292, name: 'Kirinji' },
-  'tempalay': { id: 4543781, name: 'Tempalay' },
-  'テンパレイ': { id: 4543781, name: 'Tempalay' },
-  '羊文学': { id: 6672322, name: 'Hitsujibungaku' },
-  'hitsujibungaku': { id: 6672322, name: 'Hitsujibungaku' },
-  '細野晴臣': { id: 120531, name: 'Haruomi Hosono' },
-  'haruomihosono': { id: 120531, name: 'Haruomi Hosono' }
-};
-
-
-
-// 日本語アーティスト名への逆引きマップと翻訳ヘルパー
-const REVERSE_ARTIST_MAP = {
-  'iri': 'iri',
-  'bialystocks': 'Bialystocks',
-  'chatmonchy': 'チャットモンチー',
-  'sakanaction': 'サカナクション',
-  'kirinji': 'キリンジ',
-  'tempalay': 'Tempalay',
-  'hitsujibungaku': '羊文学',
-  'haruomi hosono': '細野晴臣',
-  'gen hoshino': '星野源',
-  'nujabes': 'Nujabes',
-};
-
-function cleanArtistName(name) {
-  if (!name) return '';
-  return name.replace(/\*+$/, '').replace(/\s*\(\d+\)$/, '').trim();
-}
-
-function getJapaneseArtistName(englishName) {
-  const cleaned = cleanArtistName(englishName);
-  const norm = cleaned.toLowerCase().trim();
-  if (REVERSE_ARTIST_MAP[norm]) {
-    return REVERSE_ARTIST_MAP[norm];
-  }
-  return cleaned;
-}
+const { ARTIST_ID_MAP, REVERSE_ARTIST_MAP, cleanArtistName } = require('../services/artistRegistry');
 
 function extractJapaneseName(details) {
   if (!details) return null;
@@ -122,7 +75,7 @@ function normalizeRelease(release) {
   }
 
   // 日本語名へ翻訳
-  artist = getJapaneseArtistName(artist);
+  artist = cleanArtistName(artist);
 
   // 画像: cover_image（検索APIから取得、高解像度）を優先、なければthumbを使用
   const image = release.cover_image || release.thumb || '';

@@ -8,25 +8,8 @@
 
 const discogs = require('./discogs');
 
-// 日本の主要アナログ流通アーティストの直接IDマッピング（表記ゆれとAPI誤爆防止）
-const ARTIST_ID_MAP = {
-  'iri': { id: 5891531, name: 'iri' },
-  'イリ': { id: 5891531, name: 'iri' },
-  'bialystocks': { id: 11246145, name: 'Bialystocks' },
-  'ビアリストックス': { id: 11246145, name: 'Bialystocks' },
-  'チャットモンチー': { id: 2605808, name: 'Chatmonchy' },
-  'chatmonchy': { id: 2605808, name: 'Chatmonchy' },
-  'サカナクション': { id: 1361113, name: 'Sakanaction' },
-  'sakanaction': { id: 1361113, name: 'Sakanaction' },
-  'kirinji': { id: 396292, name: 'Kirinji' },
-  'キリンジ': { id: 396292, name: 'Kirinji' },
-  'tempalay': { id: 4543781, name: 'Tempalay' },
-  'テンパレイ': { id: 4543781, name: 'Tempalay' },
-  '羊文学': { id: 6672322, name: 'Hitsujibungaku' },
-  'hitsujibungaku': { id: 6672322, name: 'Hitsujibungaku' },
-  '細野晴臣': { id: 120531, name: 'Haruomi Hosono' },
-  'haruomihosono': { id: 120531, name: 'Haruomi Hosono' }
-};
+// 主要アナログ流通アーティストのレジストリインポート
+const { ARTIST_ID_MAP } = require('./artistRegistry');
 
 /**
  * 文字列が日本語（ひらがな・カタカナ・漢字）を含むか判定

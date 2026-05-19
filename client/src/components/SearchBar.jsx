@@ -12,6 +12,7 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isLoading) return;
     onSearch();
   };
 

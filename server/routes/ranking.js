@@ -3,28 +3,7 @@ const router = express.Router();
 const discogs = require('../services/discogs');
 const { deduplicateReleases } = require('../services/scoring');
 
-const REVERSE_ARTIST_MAP = {
-  'iri': 'iri',
-  'bialystocks': 'Bialystocks',
-  'chatmonchy': 'チャットモンチー',
-  'sakanaction': 'サカナクション',
-  'kirinji': 'キリンジ',
-  'tempalay': 'Tempalay',
-  'hitsujibungaku': '羊文学',
-  'haruomi hosono': '細野晴臣',
-  'gen hoshino': '星野源',
-  'nujabes': 'Nujabes',
-};
-
-function cleanArtistName(name) {
-  if (!name) return '';
-  let cleaned = name.replace(/\*+$/, '').replace(/\s*\(\d+\)$/, '').trim();
-  const norm = cleaned.toLowerCase();
-  if (REVERSE_ARTIST_MAP[norm]) {
-    return REVERSE_ARTIST_MAP[norm];
-  }
-  return cleaned;
-}
+const { cleanArtistName } = require('../services/artistRegistry');
 
 // 各期間（デイリー、ウィークリー、マンスリー）に応じた魅力的なシードアーティスト/キーワード
 const RANKING_SEEDS = {
