@@ -873,8 +873,8 @@ select:focus {
   }
 
   .results-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px;
   }
 
   .results-list .result-card .card-image-wrapper {
@@ -1679,7 +1679,7 @@ html {
   flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .swap-layout-btn {
     display: none !important;
   }

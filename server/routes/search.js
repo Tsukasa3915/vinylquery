@@ -48,35 +48,62 @@ const REVERSE_ARTIST_MAP = {
   'nujabes': 'Nujabes',
 };
 
+function cleanArtistName(name) {
+  if (!name) return '';
+  return name.replace(/\*+$/, '').replace(/\s*\(\d+\)$/, '').trim();
+}
+
 function getJapaneseArtistName(englishName) {
-  const norm = (englishName || '').toLowerCase().trim();
+  const cleaned = cleanArtistName(englishName);
+  const norm = cleaned.toLowerCase().trim();
   if (REVERSE_ARTIST_MAP[norm]) {
     return REVERSE_ARTIST_MAP[norm];
   }
-  return englishName;
+  return cleaned;
 }
 
 function extractJapaneseName(details) {
   if (!details) return null;
+  
+  let candidates = [];
+  
   if (details.namevariations) {
-    const jp = details.namevariations.find(v => containsJapanese(v));
-    if (jp) return jp;
+    const jpVariations = details.namevariations.filter(v => containsJapanese(v));
+    candidates.push(...jpVariations);
   }
+  
   if (details.realname) {
     const parts = details.realname.split(/[=＝]/);
     for (const part of parts) {
       const trimmed = part.trim();
       if (containsJapanese(trimmed)) {
-        return trimmed;
+        candidates.push(trimmed);
       }
     }
     if (containsJapanese(details.realname)) {
-      return details.realname.trim();
+      candidates.push(details.realname.trim());
     }
   }
+  
   if (details.name && containsJapanese(details.name)) {
-    return details.name;
+    candidates.push(details.name);
   }
+  
+  if (candidates.length === 0) return null;
+  
+  const cleanCandidates = candidates
+    .map(c => c.trim())
+    .filter(c => c.length > 0 && c.length < 20 && !c.includes('='))
+    .sort((a, b) => b.length - a.length);
+    
+  if (cleanCandidates.length > 0) {
+    const withoutSpaces = cleanCandidates.filter(c => !/\s/.test(c));
+    if (withoutSpaces.length > 0) {
+      return withoutSpaces[0];
+    }
+    return cleanCandidates[0];
+  }
+  
   return null;
 }
 
