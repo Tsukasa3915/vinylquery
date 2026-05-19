@@ -53,10 +53,11 @@ const Home = () => {
     sessionStorage.setItem('vq_isReversed', JSON.stringify(isReversed));
   }, [isReversed]);
 
-  const onSearch = () => {
-    if (query.trim()) {
+  const onSearch = (searchVal) => {
+    const activeQuery = typeof searchVal === 'string' ? searchVal : query;
+    if (activeQuery.trim()) {
       setHasSearched(true);
-      handleSearch(query, mode);
+      handleSearch(activeQuery, mode);
     }
   };
 

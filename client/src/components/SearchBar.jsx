@@ -16,8 +16,8 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
     onSearch();
   };
 
-  const placeholder = mode === 'artist' 
-    ? "例: 星野源, Nujabes, The Beatles..." 
+  const placeholder = mode === 'artist'
+    ? "例: 星野源, Nujabes, The Beatles..."
     : "例: Yellow Dancer, Cowboy Bebop Soundtrack...";
 
   return (
@@ -34,9 +34,9 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
             disabled={isLoading}
           />
           {query && (
-            <button 
-              type="button" 
-              className="clear-btn" 
+            <button
+              type="button"
+              className="clear-btn"
               onClick={() => setQuery('')}
               aria-label="Clear search"
             >
@@ -44,8 +44,8 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
             </button>
           )}
         </div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="search-submit-btn"
           disabled={isLoading || !query.trim()}
         >

@@ -420,4 +420,59 @@ router.get('/image', async (req, res, next) => {
   }
 });
 
+// ============================================================
+// GET /api/search/suggestions — 入力キーワードからアーティスト候補をサジェスト
+// ============================================================
+router.get('/suggestions', (req, res) => {
+  const { q } = req.query;
+  if (!q || !q.trim()) {
+    return res.json([]);
+  }
+
+  const query = q.toLowerCase().trim();
+  const { artistsList } = require('../services/artistRegistry');
+
+  const matches = [];
+  for (const artist of artistsList) {
+    let score = 0;
+    
+    // 1. 完全一致
+    if (artist.japaneseName.toLowerCase() === query || artist.englishName.toLowerCase() === query) {
+      score = 100;
+    }
+    // 2. 前方一致
+    else if (artist.japaneseName.toLowerCase().startsWith(query) || artist.englishName.toLowerCase().startsWith(query)) {
+      score = 80;
+    }
+    // 3. 部分一致
+    else if (artist.japaneseName.toLowerCase().includes(query) || artist.englishName.toLowerCase().includes(query)) {
+      score = 50;
+    }
+    // 4. 表記揺れ（searchTerms）の部分一致
+    else {
+      const termMatch = artist.searchTerms.some(term => term.toLowerCase().includes(query));
+      if (termMatch) {
+        score = 30;
+      }
+    }
+
+    if (score > 0) {
+      matches.push({
+        id: artist.id,
+        name: artist.japaneseName,
+        englishName: artist.englishName,
+        score
+      });
+    }
+  }
+
+  // スコア順、かつ同じスコアなら名前の長さ順でソート
+  matches.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.name.length - b.name.length;
+  });
+
+  res.json(matches.slice(0, 6));
+});
+
 module.exports = router;
