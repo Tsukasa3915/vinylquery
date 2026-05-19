@@ -37,7 +37,7 @@ const Home = () => {
   };
 
   const [hasSearched, setHasSearched] = useState(() => getInitialState('vq_hasSearched', false));
-  const [layout, setLayout] = useState(() => getInitialState('vq_layout', 'list')); // 'grid' or 'list'
+  const [layout, setLayout] = useState(() => getInitialState('vq_layout', 'grid')); // 'grid' or 'list'
   const [activeTab, setActiveTab] = useState('home'); // 'home' or 'search' (SP専用)
   const [isReversed, setIsReversed] = useState(() => getInitialState('vq_isReversed', false));
 
