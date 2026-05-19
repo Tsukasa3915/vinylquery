@@ -14,56 +14,89 @@ function isVinyl(release) {
   // format フィールドから判定（検索結果の場合）
   if (release.format) {
     const formats = Array.isArray(release.format) ? release.format : [release.format];
-    const hasVinyl = formats.some(
-      (f) => typeof f === 'string' && f.toLowerCase().includes('vinyl')
-    );
-    const hasCD = formats.some(
+    const hasNonVinyl = formats.some(
       (f) => typeof f === 'string' && (
         f.toLowerCase().includes('cd') ||
         f.toLowerCase().includes('compact disc') ||
         f.toLowerCase().includes('sacd') ||
         f.toLowerCase().includes('dvd') ||
+        f.toLowerCase().includes('blu-ray') ||
         f.toLowerCase().includes('cassette') ||
-        f.toLowerCase().includes('file')
+        f.toLowerCase().includes('file') ||
+        f.toLowerCase().includes('mp3') ||
+        f.toLowerCase().includes('vhs')
       )
     );
-    return hasVinyl && !hasCD;
+    if (hasNonVinyl) return false;
+
+    const hasVinyl = formats.some(
+      (f) => typeof f === 'string' && (
+        f.toLowerCase().includes('vinyl') ||
+        f.toLowerCase().includes('12"') ||
+        f.toLowerCase().includes('7"') ||
+        f.toLowerCase().includes('10"') ||
+        f.toLowerCase().includes('lp')
+      )
+    );
+    return hasVinyl;
   }
 
   // formats フィールドから判定（リリース詳細の場合）
   if (release.formats) {
-    const hasVinyl = release.formats.some(
-      (f) => f.name && f.name.toLowerCase().includes('vinyl')
-    );
-    const hasCD = release.formats.some(
+    const hasNonVinyl = release.formats.some(
       (f) => f.name && (
         f.name.toLowerCase().includes('cd') ||
         f.name.toLowerCase().includes('compact disc') ||
         f.name.toLowerCase().includes('sacd') ||
         f.name.toLowerCase().includes('dvd') ||
+        f.name.toLowerCase().includes('blu-ray') ||
         f.name.toLowerCase().includes('cassette') ||
-        f.name.toLowerCase().includes('file')
+        f.name.toLowerCase().includes('file') ||
+        f.name.toLowerCase().includes('mp3') ||
+        f.name.toLowerCase().includes('vhs')
       )
     );
-    return hasVinyl && !hasCD;
+    if (hasNonVinyl) return false;
+
+    const hasVinyl = release.formats.some(
+      (f) => f.name && (
+        f.name.toLowerCase().includes('vinyl') ||
+        f.name.toLowerCase().includes('12"') ||
+        f.name.toLowerCase().includes('7"') ||
+        f.name.toLowerCase().includes('10"') ||
+        f.name.toLowerCase().includes('lp')
+      )
+    );
+    return hasVinyl;
   }
 
   // role がリリース一覧の場合、basic_information から判定
   if (release.basic_information && release.basic_information.formats) {
-    const hasVinyl = release.basic_information.formats.some(
-      (f) => f.name && f.name.toLowerCase().includes('vinyl')
-    );
-    const hasCD = release.basic_information.formats.some(
+    const hasNonVinyl = release.basic_information.formats.some(
       (f) => f.name && (
         f.name.toLowerCase().includes('cd') ||
         f.name.toLowerCase().includes('compact disc') ||
         f.name.toLowerCase().includes('sacd') ||
         f.name.toLowerCase().includes('dvd') ||
+        f.name.toLowerCase().includes('blu-ray') ||
         f.name.toLowerCase().includes('cassette') ||
-        f.name.toLowerCase().includes('file')
+        f.name.toLowerCase().includes('file') ||
+        f.name.toLowerCase().includes('mp3') ||
+        f.name.toLowerCase().includes('vhs')
       )
     );
-    return hasVinyl && !hasCD;
+    if (hasNonVinyl) return false;
+
+    const hasVinyl = release.basic_information.formats.some(
+      (f) => f.name && (
+        f.name.toLowerCase().includes('vinyl') ||
+        f.name.toLowerCase().includes('12"') ||
+        f.name.toLowerCase().includes('7"') ||
+        f.name.toLowerCase().includes('10"') ||
+        f.name.toLowerCase().includes('lp')
+      )
+    );
+    return hasVinyl;
   }
 
   return false;
@@ -143,25 +176,40 @@ function filterArtistReleases(releases) {
       return false;
     }
 
-    // format が 'Vinyl' を含むものだけ通す
     if (release.format) {
       const fmt = release.format.toLowerCase();
       
-      const hasVinyl = fmt.includes('vinyl');
-      const hasCD = fmt.includes('cd') ||
-                    fmt.includes('compact disc') ||
-                    fmt.includes('sacd') ||
-                    fmt.includes('dvd') ||
-                    fmt.includes('cassette') ||
-                    fmt.includes('file') ||
-                    fmt.includes('mp3') ||
-                    fmt.includes('hybrid');
+      // 除外キーワード (CD, 映像, カセット, デジタル配信など)
+      const isNonVinyl = fmt.includes('cd') || 
+                          fmt.includes('compact disc') || 
+                          fmt.includes('sacd') || 
+                          fmt.includes('dvd') || 
+                          fmt.includes('blu-ray') || 
+                          fmt.includes('cassette') || 
+                          fmt.includes('file') || 
+                          fmt.includes('mp3') || 
+                          fmt.includes('vhs');
       
-      return hasVinyl && !hasCD;
+      if (isNonVinyl) {
+        return false;
+      }
+
+      // アナログレコードを示すキーワード
+      const isVinylFmt = fmt.includes('vinyl') || 
+                          fmt.includes('12"') || 
+                          fmt.includes('7"') || 
+                          fmt.includes('10"') || 
+                          fmt.includes('lp');
+      
+      return isVinylFmt;
     }
 
-    // format 情報がない場合は CD混入を避けるため除外する
-    return false;
+    // format情報がない場合はとりあえず残すが、タイトルなどにCD等のキーワードが含まれる場合は安全のため弾く
+    const title = (release.title || '').toLowerCase();
+    if (title.includes('cd') || title.includes('dvd') || title.includes('blu-ray')) {
+      return false;
+    }
+    return true;
   });
 }
 

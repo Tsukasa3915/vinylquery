@@ -99,17 +99,8 @@ const ReleaseDetail = () => {
       <header className="header detail-header">
         <button onClick={() => navigate(-1)} className="back-btn">← 検索結果に戻る</button>
         <h1 className="logo-text">
-          <Link to="/" style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className="logo-icon">
-              <svg className="logo-svg-disc" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="#111111" stroke="#333333" strokeWidth="2" />
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#222222" strokeWidth="1.2" />
-                <circle cx="50" cy="50" r="28" fill="none" stroke="#222222" strokeWidth="1.2" />
-                <circle cx="50" cy="50" r="18" fill="none" stroke="#222222" strokeWidth="1.2" />
-                <circle cx="50" cy="50" r="13" fill="#E94560" />
-                <circle cx="50" cy="50" r="3" fill="#111111" />
-              </svg>
-            </span> VinylQuery
+          <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            <span className="logo-icon">📀</span> VinylQuery
           </Link>
         </h1>
       </header>

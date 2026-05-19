@@ -92,16 +92,7 @@ const Home = () => {
               <div className="logo-container">
                 <a href="/" onClick={handleLogoClick} className="logo-link">
                   <h1 className="logo-text">
-                    <span className="logo-icon">
-                      <svg className="logo-svg-disc" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" fill="#111111" stroke="#333333" strokeWidth="2" />
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="28" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="18" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="13" fill="#E94560" />
-                        <circle cx="50" cy="50" r="3" fill="#111111" />
-                      </svg>
-                    </span> VinylQuery
+                    <span className="logo-icon">📀</span> VinylQuery
                   </h1>
                 </a>
               </div>
@@ -128,16 +119,7 @@ const Home = () => {
               <div className="logo-container desktop-hide-logo">
                 <a href="/" onClick={handleLogoClick} className="logo-link">
                   <h1 className="logo-text">
-                    <span className="logo-icon">
-                      <svg className="logo-svg-disc" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" fill="#111111" stroke="#333333" strokeWidth="2" />
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="28" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="18" fill="none" stroke="#222222" strokeWidth="1.2" />
-                        <circle cx="50" cy="50" r="13" fill="#E94560" />
-                        <circle cx="50" cy="50" r="3" fill="#111111" />
-                      </svg>
-                    </span> VinylQuery
+                    <span className="logo-icon">📀</span> VinylQuery
                   </h1>
                 </a>
               </div>
