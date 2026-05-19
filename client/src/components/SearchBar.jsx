@@ -13,7 +13,7 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
     }
   }, []);
 
-  // 非同期の自動サジェスト取得 (200msデバウンス)
+  // 非同期の自動サジェスト取得 (300msデバウンス)
   useEffect(() => {
     if (!query.trim()) {
       setSuggestions([]);
@@ -30,7 +30,7 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
       } catch (err) {
         console.error('[SearchBar] Failed to fetch suggestions:', err);
       }
-    }, 200);
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [query]);

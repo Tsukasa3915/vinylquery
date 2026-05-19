@@ -523,7 +523,7 @@ router.get('/suggestions', (req, res) => {
   const matches = [];
   const kataQuery = hiraToKata(query);
 
-  for (const artist of artistsList) {
+  artistsList.forEach((artist, index) => {
     let score = 0;
     const jp = artist.japaneseName.toLowerCase();
     const en = artist.englishName.toLowerCase();
@@ -567,15 +567,16 @@ router.get('/suggestions', (req, res) => {
         id: artist.id,
         name: artist.japaneseName,
         englishName: artist.englishName,
-        score
+        score,
+        index // 元の人気順インデックスを保持
       });
     }
-  }
+  });
 
-  // スコア順、かつ同じスコアなら名前の長さ順でソート
+  // スコア順（降順）、かつ同じスコアなら人気順（インデックスの昇順）でソート
   matches.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
-    return a.name.length - b.name.length;
+    return a.index - b.index;
   });
 
   res.json(matches.slice(0, 6));
