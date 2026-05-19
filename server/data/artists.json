@@ -1,5 +1,263 @@
 [
   {
+    "id": 4861614,
+    "englishName": "Mrs. Green Apple",
+    "japaneseName": "Mrs. GREEN APPLE",
+    "searchTerms": ["mrs. green apple", "mrs green apple", "ミセスグリーンアップル", "ミセス"]
+  },
+  {
+    "id": 8662991,
+    "englishName": "Ado",
+    "japaneseName": "Ado",
+    "searchTerms": ["ado", "アド", "あど"]
+  },
+  {
+    "id": 8279417,
+    "englishName": "Yoasobi",
+    "japaneseName": "YOASOBI",
+    "searchTerms": ["yoasobi", "ヨアソビ", "よあそび"]
+  },
+  {
+    "id": 7968565,
+    "englishName": "Kaze Fujii",
+    "japaneseName": "藤井風",
+    "searchTerms": ["kaze fujii", "fujii kaze", "藤井風", "フジイカゼ"]
+  },
+  {
+    "id": 3810141,
+    "englishName": "Kenshi Yonezu",
+    "japaneseName": "米津玄師",
+    "searchTerms": ["kenshi yonezu", "yonezu kenshi", "米津玄師", "ヨネヅケンシ", "ハチ", "hachi"]
+  },
+  {
+    "id": 7762694,
+    "englishName": "Vaundy",
+    "japaneseName": "Vaundy",
+    "searchTerms": ["vaundy", "バウンディ", "バウンディー"]
+  },
+  {
+    "id": 2350731,
+    "englishName": "Back Number",
+    "japaneseName": "back number",
+    "searchTerms": ["back number", "backnumber", "バックナンバー"]
+  },
+  {
+    "id": 6276857,
+    "englishName": "Creepy Nuts",
+    "japaneseName": "Creepy Nuts",
+    "searchTerms": ["creepy nuts", "creepynuts", "クリーピーナッツ"]
+  },
+  {
+    "id": 6198030,
+    "englishName": "Yorushika",
+    "japaneseName": "ヨルシカ",
+    "searchTerms": ["yorushika", "ヨルシカ"]
+  },
+  {
+    "id": 5464526,
+    "englishName": "Official Hige Dandism",
+    "japaneseName": "Official髭男dism",
+    "searchTerms": ["official hige dandism", "official髭男dism", "髭男", "ヒゲダン"]
+  },
+  {
+    "id": 1516246,
+    "englishName": "Radwimps",
+    "japaneseName": "RADWIMPS",
+    "searchTerms": ["radwimps", "ラッドウィンプス", "ラッド"]
+  },
+  {
+    "id": 5534888,
+    "englishName": "Aimyon",
+    "japaneseName": "あいみょん",
+    "searchTerms": ["aimyon", "あいみょん", "アイミョン"]
+  },
+  {
+    "id": 2424103,
+    "englishName": "LiSA",
+    "japaneseName": "LiSA",
+    "searchTerms": ["lisa", "リサ", "りさ"]
+  },
+  {
+    "id": 2683930,
+    "englishName": "Aimer",
+    "japaneseName": "Aimer",
+    "searchTerms": ["aimer", "エメ"]
+  },
+  {
+    "id": 8612151,
+    "englishName": "Yama",
+    "japaneseName": "yama",
+    "searchTerms": ["yama", "ヤマ", "やま"]
+  },
+  {
+    "id": 9242940,
+    "englishName": "Tani Yuuki",
+    "japaneseName": "Tani Yuuki",
+    "searchTerms": ["tani yuuki", "taniyuuki", "タニユウキ"]
+  },
+  {
+    "id": 7062402,
+    "englishName": "Milet",
+    "japaneseName": "milet",
+    "searchTerms": ["milet", "ミレイ", "みれい"]
+  },
+  {
+    "id": 3501060,
+    "englishName": "Sekai No Owari",
+    "japaneseName": "SEKAI NO OWARI",
+    "searchTerms": ["sekai no owari", "sekainoowari", "セカオワ", "end of the world"]
+  },
+  {
+    "id": 6204060,
+    "englishName": "King Gnu",
+    "japaneseName": "King Gnu",
+    "searchTerms": ["king gnu", "kinggnu", "キングヌー"]
+  },
+  {
+    "id": 1130638,
+    "englishName": "One Ok Rock",
+    "japaneseName": "ONE OK ROCK",
+    "searchTerms": ["one ok rock", "oneokrock", "ワンオクロック", "ワンオク"]
+  },
+  {
+    "id": 446217,
+    "englishName": "Bump Of Chicken",
+    "japaneseName": "BUMP OF CHICKEN",
+    "searchTerms": ["bump of chicken", "bumpofchicken", "バンプオブチキン", "バンプ"]
+  },
+  {
+    "id": 4559812,
+    "englishName": "Eve",
+    "japaneseName": "Eve",
+    "searchTerms": ["eve", "イブ", "いぶ"]
+  },
+  {
+    "id": 6985012,
+    "englishName": "Zutomayo",
+    "japaneseName": "ずっと真夜中でいいのに。",
+    "searchTerms": ["zutomayo", "ずっと真夜中でいいのに。", "ずとまよ"]
+  },
+  {
+    "id": 56104060,
+    "englishName": "Atarashii Gakko!",
+    "japaneseName": "新しい学校のリーダーズ",
+    "searchTerms": ["atarashii gakko!", "atarashii gakko", "新しい学校のリーダーズ", "新しい学校のリーダース"]
+  },
+  {
+    "id": 10165500,
+    "englishName": "Imase",
+    "japaneseName": "imase",
+    "searchTerms": ["imase", "イマセ"]
+  },
+  {
+    "id": 7381504,
+    "englishName": "Macaroni Empitsu",
+    "japaneseName": "マカロニえんぴつ",
+    "searchTerms": ["macaroni empitsu", "macaroniempitsu", "マカロニえんぴつ"]
+  },
+  {
+    "id": 6214060,
+    "englishName": "Saucy Dog",
+    "japaneseName": "Saucy Dog",
+    "searchTerms": ["saucy dog", "saucydog", "サシードッグ"]
+  },
+  {
+    "id": 6204061,
+    "englishName": "Ryokuoushoku Shakai",
+    "japaneseName": "緑黄色社会",
+    "searchTerms": ["ryokuoushoku shakai", "ryokuoushokusakai", "緑黄色社会", "リョクシャカ"]
+  },
+  {
+    "id": 3892700,
+    "englishName": "Da-iCE",
+    "japaneseName": "Da-iCE",
+    "searchTerms": ["da-ice", "daice", "ダイス"]
+  },
+  {
+    "id": 77626940,
+    "englishName": "Novelbright",
+    "japaneseName": "Novelbright",
+    "searchTerms": ["novelbright", "ノーベルブライト"]
+  },
+  {
+    "id": 82794171,
+    "englishName": "NiziU",
+    "japaneseName": "NiziU",
+    "searchTerms": ["niziu", "ニジュー"]
+  },
+  {
+    "id": 7900701,
+    "englishName": "Snow Man",
+    "japaneseName": "Snow Man",
+    "searchTerms": ["snow man", "snowman", "スノーマン", "スノ"]
+  },
+  {
+    "id": 7900702,
+    "englishName": "SixTONES",
+    "japaneseName": "SixTONES",
+    "searchTerms": ["sixtones", "ストーンズ", "スト"]
+  },
+  {
+    "id": 92429402,
+    "englishName": "Naniwa Danshi",
+    "japaneseName": "なにわ男子",
+    "searchTerms": ["naniwa danshi", "naniwadanshi", "なにわ男子"]
+  },
+  {
+    "id": 79685650,
+    "englishName": "JO1",
+    "japaneseName": "JO1",
+    "searchTerms": ["jo1", "ジェイオーワン"]
+  },
+  {
+    "id": 79685651,
+    "englishName": "INI",
+    "japaneseName": "INI",
+    "searchTerms": ["ini", "アイエヌアイ"]
+  },
+  {
+    "id": 92429401,
+    "englishName": "BE:FIRST",
+    "japaneseName": "BE:FIRST",
+    "searchTerms": ["be:first", "befirst", "ビーファースト", "ビーファ"]
+  },
+  {
+    "id": 2553952,
+    "englishName": "Nogizaka46",
+    "japaneseName": "乃木坂46",
+    "searchTerms": ["nogizaka46", "nogizaka 46", "乃木坂46"]
+  },
+  {
+    "id": 8600701,
+    "englishName": "Sakurazaka46",
+    "japaneseName": "櫻坂46",
+    "searchTerms": ["sakurazaka46", "sakurazaka 46", "櫻坂46", "欅坂46", "keyakizaka46"]
+  },
+  {
+    "id": 6985011,
+    "englishName": "Hinatazaka46",
+    "japaneseName": "日向坂46",
+    "searchTerms": ["hinatazaka46", "hinatazaka 46", "日向坂46"]
+  },
+  {
+    "id": 8623000,
+    "englishName": "Yuuri",
+    "japaneseName": "優里",
+    "searchTerms": ["yuuri", "yuri", "優里", "ゆうり"]
+  },
+  {
+    "id": 3798990,
+    "englishName": "wacci",
+    "japaneseName": "wacci",
+    "searchTerms": ["wacci", "ワッチ"]
+  },
+  {
+    "id": 13984180,
+    "englishName": "Tuki.",
+    "japaneseName": "tuki.",
+    "searchTerms": ["tuki.", "tuki", "ツキ"]
+  },
+  {
     "id": 180119,
     "englishName": "Tatsuro Yamashita",
     "japaneseName": "山下達郎",
@@ -88,12 +346,6 @@
     "englishName": "Akiko Yano",
     "japaneseName": "矢野顕子",
     "searchTerms": ["akiko yano", "矢野顕子", "ヤノアキコ"]
-  },
-  {
-    "id": 125191,
-    "englishName": "Hikaru Utada",
-    "japaneseName": "宇多田ヒカル",
-    "searchTerms": ["hikaru utada", "宇多田ヒカル", "ウタダヒカル", "utada"]
   },
   {
     "id": 153920,
@@ -196,36 +448,6 @@
     "englishName": "Yuta Orisaka",
     "japaneseName": "折坂悠太",
     "searchTerms": ["yuta orisaka", "折坂悠太", "オリサカユウタ"]
-  },
-  {
-    "id": 7968565,
-    "englishName": "Kaze Fujii",
-    "japaneseName": "藤井風",
-    "searchTerms": ["kaze fujii", "fujii kaze", "藤井風", "フジイカゼ"]
-  },
-  {
-    "id": 5534888,
-    "englishName": "Aimyon",
-    "japaneseName": "あいみょん",
-    "searchTerms": ["aimyon", "あいみょん", "アイミョン"]
-  },
-  {
-    "id": 7762694,
-    "englishName": "Vaundy",
-    "japaneseName": "Vaundy",
-    "searchTerms": ["vaundy", "バウンディ"]
-  },
-  {
-    "id": 8279417,
-    "englishName": "YOASOBI",
-    "japaneseName": "YOASOBI",
-    "searchTerms": ["yoasobi", "ヨアソビ"]
-  },
-  {
-    "id": 3810141,
-    "englishName": "Kenshi Yonezu",
-    "japaneseName": "米津玄師",
-    "searchTerms": ["kenshi yonezu", "yonezu kenshi", "米津玄師", "ヨネヅケンシ"]
   },
   {
     "id": 4437295,
@@ -460,156 +682,6 @@
     "englishName": "Kenji Sawada",
     "japaneseName": "沢田研二",
     "searchTerms": ["kenji sawada", "沢田研二", "ジュリー", "julie"]
-  },
-  {
-    "id": 4861614,
-    "englishName": "Mrs. GREEN APPLE",
-    "japaneseName": "Mrs. GREEN APPLE",
-    "searchTerms": ["mrs. green apple", "mrs green apple", "ミセスグリーンアップル", "ミセス"]
-  },
-  {
-    "id": 2350731,
-    "englishName": "back number",
-    "japaneseName": "back number",
-    "searchTerms": ["back number", "backnumber", "バックナンバー"]
-  },
-  {
-    "id": 5464526,
-    "englishName": "Official Hige Dandism",
-    "japaneseName": "Official髭男dism",
-    "searchTerms": ["official hige dandism", "official髭男dism", "髭男", "ヒゲダン"]
-  },
-  {
-    "id": 1516246,
-    "englishName": "RADWIMPS",
-    "japaneseName": "RADWIMPS",
-    "searchTerms": ["radwimps", "ラッドウィンプス", "ラッド"]
-  },
-  {
-    "id": 1130638,
-    "englishName": "One Ok Rock",
-    "japaneseName": "ONE OK ROCK",
-    "searchTerms": ["one ok rock", "oneokrock", "ワンオクロック", "ワンオク"]
-  },
-  {
-    "id": 446217,
-    "englishName": "Bump Of Chicken",
-    "japaneseName": "BUMP OF CHICKEN",
-    "searchTerms": ["bump of chicken", "bumpofchicken", "バンプオブチキン", "バンプ"]
-  },
-  {
-    "id": 446219,
-    "englishName": "Asian Kung-Fu Generation",
-    "japaneseName": "ASIAN KUNG-FU GENERATION",
-    "searchTerms": ["asian kung-fu generation", "asian kungfu generation", "アジカン"]
-  },
-  {
-    "id": 239637,
-    "englishName": "Unison Square Garden",
-    "japaneseName": "UNISON SQUARE GARDEN",
-    "searchTerms": ["unison square garden", "unisonsquaregarden", "ユニゾン"]
-  },
-  {
-    "id": 1130634,
-    "englishName": "Ellegarden",
-    "japaneseName": "ELLEGARDEN",
-    "searchTerms": ["ellegarden", "エルレガーデン", "エルレ"]
-  },
-  {
-    "id": 385180,
-    "englishName": "The Pillows",
-    "japaneseName": "the pillows",
-    "searchTerms": ["the pillows", "pillows", "ピロウズ"]
-  },
-  {
-    "id": 446221,
-    "englishName": "Grapevine",
-    "japaneseName": "GRAPEVINE",
-    "searchTerms": ["grapevine", "グレイプバイン"]
-  },
-  {
-    "id": 16079,
-    "englishName": "L'Arc-en-Ciel",
-    "japaneseName": "L'Arc~en~Ciel",
-    "searchTerms": ["l'arc-en-ciel", "l'arc en ciel", "larcenciel", "ラルクアンシエル", "ラルク"]
-  },
-  {
-    "id": 16080,
-    "englishName": "Glay",
-    "japaneseName": "GLAY",
-    "searchTerms": ["glay", "グレイ"]
-  },
-  {
-    "id": 153921,
-    "englishName": "Mr. Children",
-    "japaneseName": "Mr.Children",
-    "searchTerms": ["mr. children", "mr children", "ミスターチルドレン", "ミスチル"]
-  },
-  {
-    "id": 153922,
-    "englishName": "Southern All Stars",
-    "japaneseName": "サザンオールスターズ",
-    "searchTerms": ["southern all stars", "サザンオールスターズ", "サザン"]
-  },
-  {
-    "id": 2605807,
-    "englishName": "Keisuke Kuwata",
-    "japaneseName": "桑田佳祐",
-    "searchTerms": ["keisuke kuwata", "桑田佳祐", "クワタケイスケ"]
-  },
-  {
-    "id": 248743,
-    "englishName": "Masaharu Fukuyama",
-    "japaneseName": "福山雅治",
-    "searchTerms": ["masaharu fukuyama", "福山雅治", "フクヤママサハル"]
-  },
-  {
-    "id": 268393,
-    "englishName": "Noriyuki Makihara",
-    "japaneseName": "槇原敬之",
-    "searchTerms": ["noriyuki makihara", "槇原敬之", "マキハラノリユキ", "マッキー"]
-  },
-  {
-    "id": 268394,
-    "englishName": "Tamio Okuda",
-    "japaneseName": "奥田民生",
-    "searchTerms": ["tamio okuda", "奥田民生", "オクダタミオ"]
-  },
-  {
-    "id": 268395,
-    "englishName": "Kaela Kimura",
-    "japaneseName": "木村カエラ",
-    "searchTerms": ["kaela kimura", "木村カエラ", "キムラカエラ"]
-  },
-  {
-    "id": 268396,
-    "englishName": "Yuki",
-    "japaneseName": "YUKI",
-    "searchTerms": ["yuki", "ユキ", "yuki judy and mary"]
-  },
-  {
-    "id": 1360130,
-    "englishName": "Superfly",
-    "japaneseName": "Superfly",
-    "searchTerms": ["superfly", "スーパーフライ"]
-  },
-  {
-    "id": 1360132,
-    "englishName": "Misia",
-    "japaneseName": "MISIA",
-    "searchTerms": ["misia", "ミーシャ"]
-  },
-  {
-    "id": 1360134,
-    "englishName": "Ken Hirai",
-    "japaneseName": "平井堅",
-    "searchTerms": ["ken hirai", "平井堅", "ヒライケン"]
-  },
-  {
-    "id": 8662991,
-    "englishName": "Ado",
-    "japaneseName": "Ado",
-    "searchTerms": ["ado", "アド"]
   },
   {
     "id": 446214,
