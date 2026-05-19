@@ -116,9 +116,6 @@ const SearchBar = ({ query, setQuery, onSearch, mode, isLoading }) => {
               <span className="suggestion-icon">🔍</span>
               <div className="suggestion-text">
                 <span className="suggestion-name">{suggestion.name}</span>
-                {suggestion.englishName && suggestion.englishName.toLowerCase() !== suggestion.name.toLowerCase() && (
-                  <span className="suggestion-english">{suggestion.englishName}</span>
-                )}
               </div>
               <span className="suggestion-badge">アーティスト</span>
             </li>

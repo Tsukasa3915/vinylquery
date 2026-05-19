@@ -9,6 +9,7 @@ const express = require('express');
 const router = express.Router();
 
 const discogs = require('../services/discogs');
+const cache = require('../services/cache');
 const { filterReleases, filterArtistReleases } = require('../services/filter');
 const { findRealArtist, smartSort, deduplicateReleases } = require('../services/scoring');
 const { containsJapanese, resolveArtistName } = require('../services/translate');
@@ -138,6 +139,14 @@ router.post('/artist', async (req, res, next) => {
     const searchQuery = query.trim();
     const normalized = searchQuery.toLowerCase();
 
+    // キャッシュチェック
+    const cacheKey = `artist:${normalized}`;
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache] 🎯 Hit: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+
     let realArtist = null;
     if (ARTIST_ID_MAP[normalized]) {
       const mapped = ARTIST_ID_MAP[normalized];
@@ -261,7 +270,7 @@ router.post('/artist', async (req, res, next) => {
       artist: displayName
     }));
 
-    res.json({
+    const responseData = {
       artist: {
         id: realArtist.id,
         name: displayName,
@@ -269,7 +278,12 @@ router.post('/artist', async (req, res, next) => {
       },
       results: releases,
       total: releases.length,
-    });
+    };
+
+    // キャッシュに保存 (24時間)
+    cache.set(cacheKey, responseData);
+
+    res.json(responseData);
   } catch (error) {
     next(error);
   }
@@ -286,6 +300,14 @@ router.post('/freeword', async (req, res, next) => {
     }
 
     const searchQuery = query.trim();
+
+    // キャッシュチェック
+    const cacheKey = `freeword:${searchQuery.toLowerCase()}`;
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache] 🎯 Hit: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
 
     // 日本語の場合、英語名も解決
     let englishName = null;
@@ -370,11 +392,16 @@ router.post('/freeword', async (req, res, next) => {
     // スマートソート
     allReleases = smartSort(allReleases, searchQuery, englishName || '');
 
-    res.json({
+    const responseData = {
       results: allReleases,
       total: allReleases.length,
       resolved_name: englishName,
-    });
+    };
+
+    // キャッシュに保存 (24時間)
+    cache.set(cacheKey, responseData);
+
+    res.json(responseData);
   } catch (error) {
     next(error);
   }
