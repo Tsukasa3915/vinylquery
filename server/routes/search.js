@@ -16,6 +16,15 @@ const { containsJapanese, resolveArtistName } = require('../services/translate')
 
 const { ARTIST_ID_MAP, REVERSE_ARTIST_MAP, cleanArtistName } = require('../services/artistRegistry');
 
+// ひらがなからカタカナへの変換ユーティリティ
+function hiraToKata(str) {
+  if (!str) return '';
+  return str.replace(/[\u3041-\u3096]/g, function(match) {
+    const chr = match.charCodeAt(0) + 0x60;
+    return String.fromCharCode(chr);
+  });
+}
+
 function extractJapaneseName(details) {
   if (!details) return null;
   
@@ -162,20 +171,33 @@ router.post('/artist', async (req, res, next) => {
       let bestMatch = null;
       let bestScore = 0;
 
+      const kataNormalized = hiraToKata(normalized);
+
       for (const artist of artistsList) {
         let score = 0;
         const jp = artist.japaneseName.toLowerCase();
         const en = artist.englishName.toLowerCase();
         
-        if (jp === normalized || en === normalized) {
+        if (jp === normalized || en === normalized || jp === kataNormalized) {
           score = 100;
-        } else if (jp.startsWith(normalized) || en.startsWith(normalized)) {
+        } else if (jp.startsWith(normalized) || en.startsWith(normalized) || jp.startsWith(kataNormalized)) {
           score = 80;
-        } else if (jp.includes(normalized) || en.includes(normalized)) {
+        } else if (jp.includes(normalized) || en.includes(normalized) || jp.includes(kataNormalized)) {
           score = 50;
-        } else if (artist.searchTerms && artist.searchTerms.some(t => t.toLowerCase() === normalized)) {
+        } else if (artist.searchTerms && artist.searchTerms.some(t => {
+          const lt = t.toLowerCase();
+          return lt === normalized || lt === kataNormalized;
+        })) {
+          score = 70;
+        } else if (artist.searchTerms && artist.searchTerms.some(t => {
+          const lt = t.toLowerCase();
+          return lt.startsWith(normalized) || lt.startsWith(kataNormalized);
+        })) {
           score = 60;
-        } else if (artist.searchTerms && artist.searchTerms.some(t => t.toLowerCase().includes(normalized))) {
+        } else if (artist.searchTerms && artist.searchTerms.some(t => {
+          const lt = t.toLowerCase();
+          return lt.includes(normalized) || lt.includes(kataNormalized);
+        })) {
           score = 30;
         }
 
@@ -499,26 +521,44 @@ router.get('/suggestions', (req, res) => {
   const { artistsList } = require('../services/artistRegistry');
 
   const matches = [];
+  const kataQuery = hiraToKata(query);
+
   for (const artist of artistsList) {
     let score = 0;
+    const jp = artist.japaneseName.toLowerCase();
+    const en = artist.englishName.toLowerCase();
     
     // 1. 完全一致
-    if (artist.japaneseName.toLowerCase() === query || artist.englishName.toLowerCase() === query) {
+    if (jp === query || en === query || jp === kataQuery) {
       score = 100;
     }
     // 2. 前方一致
-    else if (artist.japaneseName.toLowerCase().startsWith(query) || artist.englishName.toLowerCase().startsWith(query)) {
+    else if (jp.startsWith(query) || en.startsWith(query) || jp.startsWith(kataQuery)) {
       score = 80;
     }
     // 3. 部分一致
-    else if (artist.japaneseName.toLowerCase().includes(query) || artist.englishName.toLowerCase().includes(query)) {
+    else if (jp.includes(query) || en.includes(query) || jp.includes(kataQuery)) {
       score = 50;
     }
-    // 4. 表記揺れ（searchTerms）の部分一致
+    // 4. 表記揺れ（searchTerms）のマッチ
     else {
-      const termMatch = artist.searchTerms.some(term => term.toLowerCase().includes(query));
-      if (termMatch) {
-        score = 30;
+      // 4a. 表記揺れ完全・前方一致
+      const termStartsWith = artist.searchTerms.some(term => {
+        const lt = term.toLowerCase();
+        return lt === query || lt === kataQuery || lt.startsWith(query) || lt.startsWith(kataQuery);
+      });
+      
+      if (termStartsWith) {
+        score = 60;
+      } else {
+        // 4b. 表記揺れ部分一致
+        const termMatch = artist.searchTerms.some(term => {
+          const lt = term.toLowerCase();
+          return lt.includes(query) || lt.includes(kataQuery);
+        });
+        if (termMatch) {
+          score = 30;
+        }
       }
     }
 
