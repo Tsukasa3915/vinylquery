@@ -29,19 +29,31 @@ const ReleaseDetail = () => {
         setDetails(data);
         
         const primaryImage = data.images?.find(img => img.type === 'primary') || data.images?.[0];
-        const artistName = data.artists?.[0]?.name || 'Unknown Artist';
+        const rawArtistName = data.artists?.[0]?.japaneseName || data.artists?.[0]?.name || 'Unknown Artist';
+        const REVERSE_ARTIST_MAP = {
+          'iri': 'iri',
+          'bialystocks': 'Bialystocks',
+          'chatmonchy': 'チャットモンチー',
+          'sakanaction': 'サカナクション',
+          'kirinji': 'キリンジ',
+          'tempalay': 'Tempalay',
+          'hitsujibungaku': '羊文学',
+          'haruomi hosono': '細野晴臣',
+          'gen hoshino': '星野源',
+          'nujabes': 'Nujabes',
+        };
+        const normArtist = rawArtistName.toLowerCase().trim();
+        const artistName = REVERSE_ARTIST_MAP[normArtist] || rawArtistName;
         const titleName = data.title;
         
-        if (!release) {
-          setRelease({
-            id: data.id,
-            title: titleName,
-            artist: artistName,
-            year: data.year,
-            cover_image: primaryImage?.uri || '',
-            label: data.labels?.[0]?.name || '',
-          });
-        }
+        setRelease({
+          id: data.id,
+          title: titleName,
+          artist: artistName,
+          year: data.year,
+          cover_image: primaryImage?.uri || '',
+          label: data.labels?.[0]?.name || '',
+        });
         
         // 在庫状況の取得（非同期で並行実行）
         const fetchStock = async () => {

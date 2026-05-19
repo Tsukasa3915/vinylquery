@@ -22,8 +22,8 @@ const ARTIST_ID_MAP = {
   'chatmonchy': { id: 2605808, name: 'Chatmonchy' },
   'サカナクション': { id: 1361113, name: 'Sakanaction' },
   'sakanaction': { id: 1361113, name: 'Sakanaction' },
-  'kirinji': { id: 282436, name: 'Kirinji' },
-  'キリンジ': { id: 282436, name: 'Kirinji' },
+  'kirinji': { id: 396292, name: 'Kirinji' },
+  'キリンジ': { id: 396292, name: 'Kirinji' },
   'tempalay': { id: 4543781, name: 'Tempalay' },
   'テンパレイ': { id: 4543781, name: 'Tempalay' },
   '羊文学': { id: 6672322, name: 'Hitsujibungaku' },
@@ -33,6 +33,52 @@ const ARTIST_ID_MAP = {
 };
 
 
+
+// 日本語アーティスト名への逆引きマップと翻訳ヘルパー
+const REVERSE_ARTIST_MAP = {
+  'iri': 'iri',
+  'bialystocks': 'Bialystocks',
+  'chatmonchy': 'チャットモンチー',
+  'sakanaction': 'サカナクション',
+  'kirinji': 'キリンジ',
+  'tempalay': 'Tempalay',
+  'hitsujibungaku': '羊文学',
+  'haruomi hosono': '細野晴臣',
+  'gen hoshino': '星野源',
+  'nujabes': 'Nujabes',
+};
+
+function getJapaneseArtistName(englishName) {
+  const norm = (englishName || '').toLowerCase().trim();
+  if (REVERSE_ARTIST_MAP[norm]) {
+    return REVERSE_ARTIST_MAP[norm];
+  }
+  return englishName;
+}
+
+function extractJapaneseName(details) {
+  if (!details) return null;
+  if (details.namevariations) {
+    const jp = details.namevariations.find(v => containsJapanese(v));
+    if (jp) return jp;
+  }
+  if (details.realname) {
+    const parts = details.realname.split(/[=＝]/);
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (containsJapanese(trimmed)) {
+        return trimmed;
+      }
+    }
+    if (containsJapanese(details.realname)) {
+      return details.realname.trim();
+    }
+  }
+  if (details.name && containsJapanese(details.name)) {
+    return details.name;
+  }
+  return null;
+}
 
 /**
  * リリースデータを統一フォーマットに正規化する
@@ -47,6 +93,9 @@ function normalizeRelease(release) {
     artist = parts[0].trim();
     title = parts.slice(1).join(' - ').trim();
   }
+
+  // 日本語名へ翻訳
+  artist = getJapaneseArtistName(artist);
 
   // 画像: cover_image（検索APIから取得、高解像度）を優先、なければthumbを使用
   const image = release.cover_image || release.thumb || '';
@@ -118,16 +167,6 @@ router.post('/artist', async (req, res, next) => {
         name: mapped.name,
         thumb: '',
       };
-      
-      // サムネイル画像の取得を試みる
-      try {
-        const details = await discogs.getArtistDetails(realArtist.id);
-        if (details && details.images && details.images.length > 0) {
-          realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
-        }
-      } catch (err) {
-        console.warn('Failed to fetch mapped artist thumb:', err.message);
-      }
     } else {
       // Step 1: 日本語の場合は英語名も解決する
       let englishName = null;
@@ -146,14 +185,6 @@ router.post('/artist', async (req, res, next) => {
           name: mapped.name,
           thumb: '',
         };
-        try {
-          const details = await discogs.getArtistDetails(realArtist.id);
-          if (details && details.images && details.images.length > 0) {
-            realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
-          }
-        } catch (err) {
-          console.warn('Failed to fetch mapped artist thumb:', err.message);
-        }
       } else {
         // Step 2: アーティストを検索
         const artists = await discogs.searchArtists(effectiveQuery);
@@ -166,6 +197,22 @@ router.post('/artist', async (req, res, next) => {
 
     if (!realArtist) {
       return res.json({ artist: null, results: [], total: 0 });
+    }
+
+    // アーティスト詳細（画像と日本語名）を一括取得
+    try {
+      const details = await discogs.getArtistDetails(realArtist.id);
+      if (details) {
+        if (details.images && details.images.length > 0) {
+          realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
+        }
+        const jpName = extractJapaneseName(details);
+        if (jpName) {
+          realArtist.japaneseName = jpName;
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch artist details:', err.message);
     }
 
     // Step 4: アーティストのリリース一覧を取得
@@ -189,10 +236,16 @@ router.post('/artist', async (req, res, next) => {
     // Step 7: スマートソート
     releases = smartSort(releases, searchQuery, realArtist.title || realArtist.name);
 
+    const displayName = realArtist.japaneseName || realArtist.title || realArtist.name;
+    releases = releases.map(r => ({
+      ...r,
+      artist: displayName
+    }));
+
     res.json({
       artist: {
         id: realArtist.id,
-        name: realArtist.title || realArtist.name,
+        name: displayName,
         thumb: realArtist.thumb || realArtist.cover_image || '',
       },
       results: releases,
@@ -320,6 +373,21 @@ router.get('/release/:id', async (req, res, next) => {
       details = await discogs.getMasterDetails(id);
     } else {
       details = await discogs.getReleaseDetails(id);
+    }
+
+    if (details && details.artists && details.artists.length > 0) {
+      try {
+        const artistId = details.artists[0].id;
+        const artistDetails = await discogs.getArtistDetails(artistId);
+        if (artistDetails) {
+          const jpName = extractJapaneseName(artistDetails);
+          if (jpName) {
+            details.artists[0].japaneseName = jpName;
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch artist details for release detail page:', err.message);
+      }
     }
     
     res.json(details);

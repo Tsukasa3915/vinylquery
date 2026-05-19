@@ -1191,6 +1191,7 @@ select:focus {
   height: 100%;
   z-index: 1;
   transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  opacity: 0.45;
 }
 
 /* アニメーション状態 */
@@ -1205,6 +1206,9 @@ select:focus {
 }
 
 @media (max-width: 768px) {
+  .record-player {
+    margin-bottom: 75px;
+  }
   .record-player.playing .record-disc {
     transform: translateY(30%);
   }
@@ -1673,6 +1677,12 @@ html {
   font-size: 0.8rem;
   padding: 0;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .swap-layout-btn {
+    display: none !important;
+  }
 }
 
 .swap-layout-btn:hover {
