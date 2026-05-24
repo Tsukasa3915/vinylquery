@@ -55,19 +55,29 @@ function extractJapaneseName(details) {
   if (candidates.length === 0) return null;
   
   const cleanCandidates = candidates
-    .map(c => c.trim())
-    .filter(c => c.length > 0 && c.length < 20 && !c.includes('='))
-    .sort((a, b) => b.length - a.length);
+    .map(c => c.trim().replace(/\s*\(\d+\)$/, ''))
+    .filter(c => c.length > 0 && c.length < 20 && !c.includes('='));
     
-  if (cleanCandidates.length > 0) {
-    const withoutSpaces = cleanCandidates.filter(c => !/\s/.test(c));
-    if (withoutSpaces.length > 0) {
-      return withoutSpaces[0];
-    }
-    return cleanCandidates[0];
+  if (cleanCandidates.length === 0) return null;
+  
+  // 優先順位①: 主要アーティストレジストリに登録されている日本語名と完全一致するものがあればそれを最優先！
+  const { artistsList } = require('../services/artistRegistry');
+  for (const artist of artistsList) {
+    const exactMatch = cleanCandidates.find(c => c === artist.japaneseName);
+    if (exactMatch) return exactMatch;
   }
   
-  return null;
+  // 優先順位②: スペースを含まないもので、かつ「最も文字数が短いもの」を優先！
+  // (文字数の降順ソートだと「〜ウォーキング」や「スチャット〜」のような最長のゴミ名義が優先されてしまうため、昇順にする)
+  const withoutSpaces = cleanCandidates.filter(c => !/\s/.test(c));
+  if (withoutSpaces.length > 0) {
+    withoutSpaces.sort((a, b) => a.length - b.length); // 昇順（短いもの勝ち）
+    return withoutSpaces[0];
+  }
+  
+  // 最終フォールバック: 文字数の短い順にソートして一番短いものを返す
+  cleanCandidates.sort((a, b) => a.length - b.length);
+  return cleanCandidates[0];
 }
 
 /**
