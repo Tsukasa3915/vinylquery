@@ -11,7 +11,7 @@ const ArtistSelection = ({ candidates, onSelect, isLoading }) => {
   }
 
   return (
-    <div className="artist-selection-container">
+    <div className="artist-selection-container" translate="no">
       <div className="selection-header">
         <span className="selection-icon">👥</span>
         <h3>該当するアーティストを選択してください</h3>

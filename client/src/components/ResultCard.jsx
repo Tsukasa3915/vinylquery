@@ -156,7 +156,7 @@ const ResultCard = ({ release, index, layout, hideLabel = false, hideFormat = fa
   const cardClass = `result-card ${layout === 'list' ? 'list-view' : ''} ${isVisible ? 'is-visible' : ''}`;
 
   return (
-    <div className={cardClass} ref={cardRef}>
+    <div className={cardClass} ref={cardRef} translate="no">
       <Link 
         to={`/release/${release.id}?type=${release.uri ? 'release' : 'master'}`} 
         className="card-link"

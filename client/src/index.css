@@ -2058,6 +2058,9 @@ body::after {
   padding: 30px;
   margin-top: 20px;
   box-shadow: var(--shadow-glass);
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .selection-header {
@@ -2182,7 +2185,7 @@ body::after {
   }
 
   .artist-candidates-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
     gap: 12px;
   }
 
