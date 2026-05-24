@@ -140,9 +140,7 @@ const ReleaseDetail = () => {
             <div className="detail-meta">
               {release?.year && <span className="meta-tag">{release.year}</span>}
               {release?.label && <span className="meta-tag">{release.label}</span>}
-              {details?.genres && <span className="meta-tag">{details.genres.join(', ')}</span>}
             </div>
-
             {/* 店舗リンク（アフィリエイトエリア） */}
             <div className="affiliate-section">
               <h3 className="affiliate-title">ショップで在庫を探す</h3>

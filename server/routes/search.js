@@ -138,6 +138,9 @@ function extractFormatDetail(release) {
 // ============================================================
 // POST /api/search/artist — アーティストから探す（厳密検索）
 // ============================================================
+// ============================================================
+// POST /api/search/artist — アーティスト候補の検索
+// ============================================================
 router.post('/artist', async (req, res, next) => {
   try {
     const { query } = req.body;
@@ -148,145 +151,220 @@ router.post('/artist', async (req, res, next) => {
     const searchQuery = query.trim();
     const normalized = searchQuery.toLowerCase();
 
-    // キャッシュチェック
-    const cacheKey = `artist:${normalized}`;
+    // キャッシュチェック（アーティスト候補検索用のキー）
+    const cacheKey = `artist-candidates:${normalized}`;
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
-      console.log(`[Cache] 🎯 Hit: "${cacheKey}"`);
+      console.log(`[Cache] 🎯 Hit Candidates: "${cacheKey}"`);
       return res.json(cachedData);
     }
 
-    let realArtist = null;
-    if (ARTIST_ID_MAP[normalized]) {
-      const mapped = ARTIST_ID_MAP[normalized];
-      realArtist = {
-        id: mapped.id,
-        title: mapped.name,
-        name: mapped.name,
-        thumb: '',
-      };
-    } else {
-      // 主要アーティストのレジストリから部分一致を優先的に探す (「椎名」で「椎名林檎」などを解決する)
-      const { artistsList } = require('../services/artistRegistry');
-      let bestMatch = null;
-      let bestScore = 0;
+    let registryMatches = [];
 
-      const kataNormalized = hiraToKata(normalized);
+    // 1. レジストリ（主要アーティスト）から部分一致を優先的に探す
+    const { artistsList } = require('../services/artistRegistry');
+    const kataNormalized = hiraToKata(normalized);
 
-      for (const artist of artistsList) {
-        let score = 0;
-        const jp = artist.japaneseName.toLowerCase();
-        const en = artist.englishName.toLowerCase();
-        
-        if (jp === normalized || en === normalized || jp === kataNormalized) {
-          score = 100;
-        } else if (jp.startsWith(normalized) || en.startsWith(normalized) || jp.startsWith(kataNormalized)) {
-          score = 80;
-        } else if (jp.includes(normalized) || en.includes(normalized) || jp.includes(kataNormalized)) {
-          score = 50;
-        } else if (artist.searchTerms && artist.searchTerms.some(t => {
-          const lt = t.toLowerCase();
-          return lt === normalized || lt === kataNormalized;
-        })) {
-          score = 70;
-        } else if (artist.searchTerms && artist.searchTerms.some(t => {
-          const lt = t.toLowerCase();
-          return lt.startsWith(normalized) || lt.startsWith(kataNormalized);
-        })) {
-          score = 60;
-        } else if (artist.searchTerms && artist.searchTerms.some(t => {
-          const lt = t.toLowerCase();
-          return lt.includes(normalized) || lt.includes(kataNormalized);
-        })) {
-          score = 30;
-        }
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = artist;
-        }
+    for (const artist of artistsList) {
+      let score = 0;
+      const jp = artist.japaneseName.toLowerCase();
+      const en = artist.englishName.toLowerCase();
+      
+      if (jp === normalized || en === normalized || jp === kataNormalized) {
+        score = 100;
+      } else if (jp.startsWith(normalized) || en.startsWith(normalized) || jp.startsWith(kataNormalized)) {
+        score = 80;
+      } else if (jp.includes(normalized) || en.includes(normalized) || jp.includes(kataNormalized)) {
+        score = 50;
       }
 
-      if (bestMatch && bestScore >= 50) {
-        console.log(`[Search] 🎯 主要アーティスト部分一致解決: "${searchQuery}" → "${bestMatch.japaneseName}" (ID: ${bestMatch.id}, Score: ${bestScore})`);
-        realArtist = {
-          id: bestMatch.id,
-          title: bestMatch.englishName,
-          name: bestMatch.englishName,
-          japaneseName: bestMatch.japaneseName,
+      if (score > 0) {
+        registryMatches.push({
+          id: artist.id,
+          name: artist.japaneseName,
+          englishName: artist.englishName,
           thumb: '',
-        };
-      } else {
-        // Step 1: 日本語の場合は英語名も解決する
-        let englishName = null;
-        if (containsJapanese(searchQuery)) {
-          englishName = await resolveArtistName(searchQuery);
-        }
-
-        const effectiveQuery = englishName || searchQuery;
-        const normEffective = effectiveQuery.toLowerCase().trim();
-        
-        if (ARTIST_ID_MAP[normEffective]) {
-          const mapped = ARTIST_ID_MAP[normEffective];
-          realArtist = {
-            id: mapped.id,
-            title: mapped.name,
-            name: mapped.name,
-            thumb: '',
-          };
-        } else {
-          // Step 2: アーティストを検索
-          const artists = await discogs.searchArtists(effectiveQuery);
-          if (artists && artists.length > 0) {
-            // Step 3: 偽物排除アルゴリズムで「本物」を特定
-            realArtist = findRealArtist(artists, effectiveQuery);
-          }
-        }
+          score: score + 10, // 主要レジストリからのマッチなので少し優遇
+        });
       }
     }
 
-    if (!realArtist) {
-      return res.json({ artist: null, results: [], total: 0 });
+    // 2. Discogs API による検索
+    let englishName = null;
+    if (containsJapanese(searchQuery)) {
+      englishName = await resolveArtistName(searchQuery);
     }
+
+    const effectiveQuery = englishName || searchQuery;
+    const apiArtists = await discogs.searchArtists(effectiveQuery);
+
+    const scoredApiArtists = [];
+    if (apiArtists && apiArtists.length > 0) {
+      // 偽物排除ロジックに類似した方法で候補全体をスコアリング
+      const penaltyKeywords = ['bot', 'tribute', 'cover', 'karaoke', 'midi', 'homage'];
+      
+      for (const artist of apiArtists) {
+        let score = 0;
+        const name = (artist.title || artist.name || '').toLowerCase();
+        const normEffective = effectiveQuery.toLowerCase().trim();
+
+        if (name === normEffective) {
+          score += 100;
+        } else if (name.startsWith(normEffective)) {
+          score += 50;
+        } else if (name.includes(normEffective)) {
+          score += 20;
+        }
+
+        penaltyKeywords.forEach(k => {
+          if (name.includes(k)) score -= 60;
+        });
+
+        const id = artist.id || Infinity;
+        if (id < 100000) score += 30;
+        else if (id < 1000000) score += 15;
+        else if (id > 10000000) score -= 10;
+
+        if (/\(\d+\)/.test(artist.title || artist.name || '')) {
+          score -= 15;
+        }
+
+        scoredApiArtists.push({
+          id: artist.id,
+          name: artist.title || artist.name,
+          englishName: artist.name !== artist.title ? artist.name : '',
+          thumb: artist.thumb || artist.cover_image || '',
+          score: score
+        });
+      }
+    }
+
+    // 3. マージと重複排除
+    const merged = [...registryMatches, ...scoredApiArtists];
+    const seen = new Set();
+    const uniqueCandidates = [];
+
+    for (const item of merged) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        uniqueCandidates.push(item);
+      }
+    }
+
+    // スコアでソート
+    uniqueCandidates.sort((a, b) => b.score - a.score);
+
+    // 上位候補のサムネイル画像を補完 (詳細APIを叩く)
+    // 最初の数件だけ並列で詳細情報を取得して、より正確な画像と名前情報を入れる
+    const limit = Math.min(uniqueCandidates.length, 6);
+    const detailPromises = [];
+
+    for (let i = 0; i < limit; i++) {
+      const candidate = uniqueCandidates[i];
+      detailPromises.push(
+        (async () => {
+          try {
+            const details = await discogs.getArtistDetails(candidate.id);
+            if (details) {
+              if (details.images && details.images.length > 0 && !candidate.thumb) {
+                candidate.thumb = details.images[0].uri || details.images[0].resource_url || '';
+              }
+              const jpName = extractJapaneseName(details);
+              if (jpName) {
+                candidate.name = jpName;
+                candidate.englishName = details.name;
+              }
+            }
+          } catch (e) {
+            console.warn(`Failed to fetch details for candidate ${candidate.id}`);
+          }
+        })()
+      );
+    }
+
+    await Promise.all(detailPromises);
+
+    const responseData = {
+      isSelectionRequired: true,
+      artists: uniqueCandidates.slice(0, 10), // 最大10件の候補を返す
+    };
+
+    // キャッシュ保存
+    cache.set(cacheKey, responseData);
+
+    res.json(responseData);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ============================================================
+// POST /api/search/artist/releases — 選択したアーティストの公式リリース一覧
+// ============================================================
+router.post('/artist/releases', async (req, res, next) => {
+  try {
+    const { artistId, artistName } = req.body;
+    if (!artistId) {
+      return res.status(400).json({ error: 'artistId is required' });
+    }
+
+    const cacheKey = `artist-releases:${artistId}`;
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      console.log(`[Cache] 🎯 Hit Releases: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+
+    let realArtist = {
+      id: artistId,
+      name: artistName || '',
+      title: artistName || '',
+      thumb: '',
+    };
 
     // アーティスト詳細（画像と日本語名）を一括取得
     try {
-      const details = await discogs.getArtistDetails(realArtist.id);
+      const details = await discogs.getArtistDetails(artistId);
       if (details) {
         if (details.images && details.images.length > 0) {
           realArtist.thumb = details.images[0].uri || details.images[0].resource_url || '';
         }
         const jpName = extractJapaneseName(details);
         if (jpName) {
-          realArtist.japaneseName = jpName;
+          realArtist.name = jpName;
+        } else if (details.name) {
+          realArtist.name = details.name;
         }
       }
     } catch (err) {
-      console.warn('Failed to fetch artist details:', err.message);
+      console.warn('Failed to fetch artist details in releases API:', err.message);
     }
 
-    // Step 4: アーティストのリリース一覧を取得
-    const releasesData = await discogs.getArtistReleases(realArtist.id);
+    // Step 1: アーティストのリリース一覧を取得
+    const releasesData = await discogs.getArtistReleases(artistId);
     let releases = releasesData.releases || [];
 
-    // Step 5: Vinyl & 公式版フィルタ
+    // Step 2: ★超重要★ ゲスト参加やコンピレーションのノイズを除去するため、role === 'Main' のもののみを抽出！
+    releases = releases.filter(r => r.role === 'Main');
+
+    // Step 3: Vinyl & 公式版フィルタ
     releases = filterArtistReleases(releases);
 
-    // Step 6: データを正規化
+    // Step 4: データを正規化
     releases = releases.map((r) => {
       return normalizeRelease({
         ...r,
-        artist: r.artist || realArtist.title || realArtist.name,
+        artist: r.artist || realArtist.name,
       });
     });
 
     // 重複排除を適用して別形態の重複を間引く
     releases = deduplicateReleases(releases);
 
-    // Step 7: スマートソート
-    releases = smartSort(releases, searchQuery, realArtist.title || realArtist.name);
+    // Step 5: スマートソート
+    releases = smartSort(releases, realArtist.name, realArtist.name);
 
-    const displayName = realArtist.japaneseName || realArtist.title || realArtist.name;
+    const displayName = realArtist.name;
     releases = releases.map(r => ({
       ...r,
       artist: displayName
@@ -296,7 +374,7 @@ router.post('/artist', async (req, res, next) => {
       artist: {
         id: realArtist.id,
         name: displayName,
-        thumb: realArtist.thumb || realArtist.cover_image || '',
+        thumb: realArtist.thumb || '',
       },
       results: releases,
       total: releases.length,

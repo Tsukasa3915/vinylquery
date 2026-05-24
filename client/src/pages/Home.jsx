@@ -5,6 +5,7 @@ import SearchBar from '../components/SearchBar';
 import SortDropdown from '../components/SortDropdown';
 import LayoutToggle from '../components/LayoutToggle';
 import ResultList from '../components/ResultList';
+import ArtistSelection from '../components/ArtistSelection';
 import RankingSection from '../components/RankingSection';
 import BottomNav from '../components/BottomNav';
 
@@ -17,11 +18,13 @@ const Home = () => {
     results,
     originalResultsCount,
     artistInfo,
+    artistCandidates,
     isLoading,
     error,
     sortOption,
     setSortOption,
     handleSearch,
+    selectArtist,
     resetSearch
   } = useSearch();
 
@@ -66,6 +69,14 @@ const Home = () => {
     setActiveTab('home');
     setHasSearched(false);
     resetSearch();
+  };
+
+  const handleSelectArtist = (artistId, artistName, artistThumb) => {
+    setHasSearched(true);
+    selectArtist(artistId, artistName, artistThumb);
+    
+    // SP版の場合は自動的に検索タブ（結果画面）に切り替える
+    setActiveTab('search');
   };
 
   const handleSwapLayout = () => {
@@ -140,7 +151,7 @@ const Home = () => {
 
           {/* 検索結果 */}
           <main className="main-content">
-            {hasSearched && !isLoading && !error && (
+            {hasSearched && !isLoading && !error && artistCandidates.length === 0 && (
               <div className="results-header">
                 <div className="results-summary">
                   {mode === 'artist' && artistInfo && (
@@ -167,12 +178,20 @@ const Home = () => {
               </div>
             )}
 
-            <ResultList 
-              results={results} 
-              isLoading={isLoading} 
-              hasSearched={hasSearched}
-              layout={displayLayout}
-            />
+            {artistCandidates && artistCandidates.length > 0 ? (
+              <ArtistSelection 
+                candidates={artistCandidates}
+                onSelect={handleSelectArtist}
+                isLoading={isLoading}
+              />
+            ) : (
+              <ResultList 
+                results={results} 
+                isLoading={isLoading} 
+                hasSearched={hasSearched}
+                layout={displayLayout}
+              />
+            )}
           </main>
 
         </div>
